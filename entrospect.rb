@@ -8,7 +8,7 @@ class Entrospection
   def initialize(opts = {})
     @width = opts.fetch(:width, 1).to_i
     @height = opts.fetch(:height, 1).to_i
-    @contrast = opts.fetch(:contrast, 0.05).to_f.abs
+    @contrast = opts.fetch(:contrast, 0.5).to_f.abs
     remaining = (opts.keys - [ :width, :height, :contrast ]).first
     raise ArgumentError, "unrecognized option: #{remaining}" if remaining
     raise ArgumentError, "contrast out of bounds" if @contrast > 1.0
@@ -19,8 +19,15 @@ class Entrospection
     @grid = Array.new(256) { Array.new(256) { Array.new(@faces, 0) } }
     @prev_byte = nil
     @face = 0
+
+    @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
+    @bytes = 0
+    @set_bits = 0
+    @pvalue = Hash.new { |h,k| h[k] = Array.new }
+    @pvalue_interval = 128
   end
-  attr_reader :width, :height, :contrast, :grid, :faces
+  attr_reader :width, :height, :contrast, :grid, :faces, :bytes, :set_bits
+  attr_reader :pvalue
 
   # Stream bytes in for analysis. Provide any object that responds to
   # .each_byte()
@@ -35,14 +42,35 @@ class Entrospection
         @prev_byte = src.to_i % 256
         return nil
       end
+      @bytes = 1
+      @set_bits += @set_bit_lookup[@prev_byte]
     end
 
     # Process, rotating through all faces one byte at a time
     src.each_byte do |c|
+      @set_bits += @set_bit_lookup[c]
+      @bytes += 1
       @grid[@prev_byte][c][@face] += 1
       @prev_byte = c
       @face = (@face + 1) % @faces
+
+      # Periodically compute our p-values
+      if @bytes % @pvalue_interval == 0
+        @pvalue[:binomial] << (bpv(@set_bits, @bytes * 8) * 65536).to_i
+        if @pvalue[:binomial].length == 1024
+          512.times { |i| @pvalue[:binomial].delete_at i }  # every other entry
+          @pvalue_interval *= 2
+        end
+      end
     end
+  end
+
+  # Helper method to compute the probability that a truly random, unbiased
+  # sequence would produce a ratio of set bits to total bits more extreme
+  # than those provided.
+  def bpv(set, total)
+    cf = Math.erfc(2**(-0.5) * (total / 2.0 - set) / (total / 4.0)**(0.5)) / 2
+    [ cf, 1.0 - cf ].min * 2   # probability on either extreme
   end
 
   # Minimum and maximum grid values
@@ -108,7 +136,8 @@ end
 if $0 == __FILE__
   src = $stdin
   src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 3, height: 2, contrast: 0.8)
+  ent = Entrospection.new(width: 1, height: 1, contrast: 0.8)
   ent << src
   ent.heatmap_png.save('output.png', :interlace => true)
+  puts ent.pvalue[:binomial].inspect
 end
