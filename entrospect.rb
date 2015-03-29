@@ -126,8 +126,7 @@ class Entrospection
         i >>= 1
       end
     end
-    max = freq.max
-    freq.collect { |x| x.to_f / max }
+    freq.collect { |x| x.to_f / @bytes }
   end
 
   # Return a ChunkyPNG image describing the frequency of each byte value
@@ -148,6 +147,23 @@ class Entrospection
           blue = 170 - adj * 2
         end
         png[x, y] = ChunkyPNG::Color.rgba(red, [ red, blue ].min, blue, 0xFF)
+      end
+    end
+    png
+  end
+
+  # Return a ChunkyPNG image describing the distribution of each bit
+  def bit_png
+    png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
+    256.times { |x| png[x, 128] = ChunkyPNG::Color.rgba(99, 99, 99, 0xFF) }
+    bit_histogram.each_with_index do |freq, i|
+      # This scales from 48.0% to 52.0%
+      h = 2**(Math.log((freq - 0.5).abs, 10) + 8.7) + 1
+      h = [ h.to_i, 127 ].min
+      h.times do |y|
+        color = ChunkyPNG::Color.rgba(y * 2, [ 180 - y * 2, 0 ].max, 0, 0xFF)
+        y = 0 - y if freq > 0.5
+        20.times { |x| png[i * 32 + 6 + x, 128 + y] = color }
       end
     end
     png
@@ -176,5 +192,6 @@ if $0 == __FILE__
   ent << src
   ent.correlation_png.save('correlation.png', :interlace => true)
   ent.byte_png.save('byte.png', :interlace => true)
+  ent.bit_png.save('bit.png', :interlace => true)
   ent.pvalue_png(:binomial).save('binomial.png', :interlace => true)
 end
