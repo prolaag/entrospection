@@ -23,10 +23,16 @@ class Entrospection
     @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
     @bytes = 0
     @set_bits = 0
+    @q_set_bits = 0
     @pvalue = Hash.new { |h,k| h[k] = Array.new }
     @pvalue_interval = 128
+    @qbuf = [ 0 ] * 8
+    @ddec = 0
+    @dinc = 0
+    @byte_count = [ 0 ] * 256
   end
   attr_reader :width, :height, :grid, :faces, :bytes, :set_bits, :pvalue
+  attr_reader :byte_histogram
   attr_accessor :contrast
 
   # Stream bytes in for analysis. Provide any object that responds to
@@ -43,23 +49,49 @@ class Entrospection
         return nil
       end
       @bytes = 1
+      @byte_count[@prev_byte] += 1
       @set_bits += @set_bit_lookup[@prev_byte]
     end
 
     # Process, rotating through all faces one byte at a time
     src.each_byte do |c|
+      @byte_count[c] += 1
       @set_bits += @set_bit_lookup[c]
       @bytes += 1
       @grid[@prev_byte][c][@face] += 1
       @prev_byte = c
       @face = (@face + 1) % @faces
 
-      # Periodically compute our p-values
-      if @bytes % @pvalue_interval == 0
-        @pvalue[:binomial] << bpv(@set_bits, @bytes * 8)
-        if @pvalue[:binomial].length == 1024
-          512.times { |i| @pvalue[:binomial].delete_at i }  # every other entry
-          @pvalue_interval *= 2
+      # Runs and Q-independence tests
+      @q_set_bits += @set_bit_lookup[@qbuf.shift ^ c]
+      @qbuf.push c
+      if @bytes % 8 == 0
+        if (@qbuf[0] << 24) + (@qbuf[1] << 16) + (@qbuf[2] << 8) + @qbuf[3] >
+           (@qbuf[4] << 24) + (@qbuf[5] << 16) + (@qbuf[6] << 8) + @qbuf[7]
+          @ddec += 1
+        else
+          @dinc += 1
+        end
+
+        # Periodically compute our p-values
+        if @bytes % @pvalue_interval == 0
+          hist = @byte_count.sort
+          e0 = (hist[0] * hist[255])**0.5
+          e1 = (hist[1] * hist[254])**0.5
+
+          @pvalue[:binomial] << bpv(@set_bits, @bytes * 8)
+          @pvalue[:runs] << bpv(@ddec, @ddec + @dinc)
+          @pvalue[:qindependence] << bpv(@q_set_bits, @bytes * 8)
+          @pvalue[:gauss_sum] << bpv(e0, e0 + e1)
+
+          # If we have at least 2^10 entries, throw every other one away and
+          # double our sampling interval.
+          if @pvalue[:binomial].length == 1024
+            @pvalue.keys.each do |ptype|
+              512.times { |i| @pvalue[ptype].delete_at i }
+            end
+            @pvalue_interval *= 2
+          end
         end
       end
     end
@@ -69,6 +101,7 @@ class Entrospection
   # sequence would produce a ratio of set bits to total bits more extreme
   # than those provided.
   def bpv(set, total)
+    return 0.5 if total == 0
     cf = Math.erfc(2**(-0.5) * (total / 2.0 - set) / (total / 4.0)**(0.5)) / 2
     [ cf, 1.0 - cf ].min * 2   # probability on either extreme
   end
@@ -119,8 +152,7 @@ class Entrospection
   # significant bit to most significant.
   def bit_histogram
     freq = Array.new(8, 0)
-    byte = @grid.collect { |c| c.collect { |r| r.inject(:+) }.inject(:+) }
-    byte.each_with_index do |count, i|
+    @byte_count.each_with_index do |count, i|
       8.times do |p|
         freq[p] += (i & 1) * count
         i >>= 1
@@ -193,5 +225,7 @@ if $0 == __FILE__
   ent.correlation_png.save('correlation.png', :interlace => true)
   ent.byte_png.save('byte.png', :interlace => true)
   ent.bit_png.save('bit.png', :interlace => true)
-  ent.pvalue_png(:binomial).save('binomial.png', :interlace => true)
+  ent.pvalue.each_key do |pt|
+    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
+  end
 end
