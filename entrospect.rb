@@ -26,8 +26,8 @@ class Entrospection
     @pvalue = Hash.new { |h,k| h[k] = Array.new }
     @pvalue_interval = 128
   end
-  attr_reader :width, :height, :contrast, :grid, :faces, :bytes, :set_bits
-  attr_reader :pvalue
+  attr_reader :width, :height, :grid, :faces, :bytes, :set_bits, :pvalue
+  attr_accessor :contrast
 
   # Stream bytes in for analysis. Provide any object that responds to
   # .each_byte()
@@ -56,7 +56,7 @@ class Entrospection
 
       # Periodically compute our p-values
       if @bytes % @pvalue_interval == 0
-        @pvalue[:binomial] << (bpv(@set_bits, @bytes * 8) * 65536).to_i
+        @pvalue[:binomial] << bpv(@set_bits, @bytes * 8)
         if @pvalue[:binomial].length == 1024
           512.times { |i| @pvalue[:binomial].delete_at i }  # every other entry
           @pvalue_interval *= 2
@@ -81,8 +81,8 @@ class Entrospection
     @grid.collect { |col| col.collect { |row| row.max }.max }.max
   end
 
-  # Return a ChunkyPNG image describing all observed bytes
-  def heatmap_png
+  # Return a ChunkyPNG image describing all observed adjacent byte correlations
+  def correlation_png
     png = ChunkyPNG::Image.new(@width * 256, @height * 256)
     f = 0
 
@@ -130,14 +130,51 @@ class Entrospection
     freq.collect { |x| x.to_f / max }
   end
 
+  # Return a ChunkyPNG image describing the frequency of each byte value
+  def byte_png
+    png = ChunkyPNG::Image.new(256, 256)
+    his = byte_histogram()
+    avg = his.inject(:+) / 256
+    scale = 4096 * @contrast
+    256.times do |y|
+      256.times do |x|
+        freq = his[(y / 16) * 16 + (x / 16)]
+        adj = [ ((freq - avg).abs * scale).to_i, 85 ].min
+        if freq > avg
+          red = 170 - adj * 2
+          blue = 170 + adj
+        else
+          red = 170 + adj
+          blue = 170 - adj * 2
+        end
+        png[x, y] = ChunkyPNG::Color.rgba(red, [ red, blue ].min, blue, 0xFF)
+      end
+    end
+    png
+  end
+
+  # Return a ChunkyPNG image graphing the provided pvalue over time
+  def pvalue_png(dist = :binomial)
+    png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
+    256.times do |x|
+      pos = @pvalue[dist][x * @pvalue[dist].length / 256]
+      y = Math.log(pos * 1000000) * 25 - 90
+      [ y, 3 ].max.to_i.times do |h|
+        png[x, 255 - h] = ChunkyPNG::Color.rgba(255 - h, h, 0, 0xFF)
+      end
+    end
+    png
+  end
+
 end
 
 
 if $0 == __FILE__
   src = $stdin
   src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 1, height: 1, contrast: 0.8)
+  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
   ent << src
-  ent.heatmap_png.save('output.png', :interlace => true)
-  puts ent.pvalue[:binomial].inspect
+  ent.correlation_png.save('correlation.png', :interlace => true)
+  ent.byte_png.save('byte.png', :interlace => true)
+  ent.pvalue_png(:binomial).save('binomial.png', :interlace => true)
 end
