@@ -6,30 +6,36 @@ require 'chunky_png'
 class Entrospection
 
   def initialize(opts = {})
+    @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
     @width = opts.fetch(:width, 1).to_i
     @height = opts.fetch(:height, 1).to_i
     @contrast = opts.fetch(:contrast, 0.5).to_f.abs
+
+    # Option validation
     remaining = (opts.keys - [ :width, :height, :contrast ]).first
     raise ArgumentError, "unrecognized option: #{remaining}" if remaining
     raise ArgumentError, "contrast out of bounds" if @contrast > 1.0
     raise ArgumentError, "height too small" if @height < 1
     raise ArgumentError, "width too small" if @width < 1
 
+    # Size-adjustable display
     @faces = @width * @height
     @grid = Array.new(256) { Array.new(256) { Array.new(@faces, 0) } }
-    @prev_byte = nil
     @face = 0
 
-    @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
+    # Streaming analysis
+    @prev_byte = nil
     @bytes = 0
     @set_bits = 0
     @q_set_bits = 0
-    @pvalue = Hash.new { |h,k| h[k] = Array.new }
-    @pvalue_interval = 128
     @qbuf = [ 0 ] * 8
     @ddec = 0
     @dinc = 0
     @byte_count = [ 0 ] * 256
+
+    # Interpreted results
+    @pvalue = Hash.new { |h,k| h[k] = Array.new }
+    @pvalue_interval = 128
   end
   attr_reader :width, :height, :grid, :faces, :bytes, :set_bits, :pvalue
   attr_reader :byte_histogram
@@ -115,7 +121,7 @@ class Entrospection
   end
 
   # Return a ChunkyPNG image describing all observed adjacent byte correlations
-  def correlation_png
+  def covariance_png
     png = ChunkyPNG::Image.new(@width * 256, @height * 256)
     f = 0
 
@@ -222,7 +228,7 @@ if $0 == __FILE__
   src = File.open(ARGV.first) if ARGV.first
   ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
   ent << src
-  ent.correlation_png.save('correlation.png', :interlace => true)
+  ent.covariance_png.save('covariance.png', :interlace => true)
   ent.byte_png.save('byte.png', :interlace => true)
   ent.bit_png.save('bit.png', :interlace => true)
   ent.pvalue.each_key do |pt|
