@@ -121,7 +121,7 @@ class Entrospection
   end
 
   # Return a ChunkyPNG image describing all observed adjacent byte correlations
-  def correlation_png
+  def covariance_png
     png = ChunkyPNG::Image.new(@width * 256, @height * 256)
     f = 0
 
@@ -228,7 +228,7 @@ if $0 == __FILE__
   src = File.open(ARGV.first) if ARGV.first
   ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
   ent << src
-  ent.correlation_png.save('correlation.png', :interlace => true)
+  ent.covariance_png.save('covariance.png', :interlace => true)
   ent.byte_png.save('byte.png', :interlace => true)
   ent.bit_png.save('bit.png', :interlace => true)
   ent.pvalue.each_key do |pt|
