@@ -6,9 +6,11 @@
 
 # This case demonstrates the utility of the "q-independence" test.
 
+Signal.trap("INT") { exit(0) }
+
 i = 0
-(2**17).times do
+loop do
   i = (i * 6364136223846793005 + 1442695040888963407) % 2**64
-  print([i].pack('L>'))
+  print([i].pack('Q>')) rescue break
 end
 

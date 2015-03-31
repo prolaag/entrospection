@@ -10,11 +10,14 @@
 
 require 'digest/md5'
 
-s = 0
-(2**17).times do |i|
+Signal.trap("INT") { exit(0) }
+
+i = s = 0
+loop do
   s = (s * 6364136223846793005 + 1442695040888963407) % 2**64
   raw = Digest::MD5.digest(s.to_s)
   raw.delete!('e') if i % 7 == 0
-  print(raw)
+  print(raw) rescue break
+  i += 1
 end
 

@@ -46,4 +46,11 @@ def murmur_hash2(txt)
   return h
 end
 
-(2**18).times { |i| print [ murmur_hash2([i].pack('L>')) ].pack('L>') }
+Signal.trap("INT") { exit(0) }
+
+i = 0
+loop do
+  print [ murmur_hash2([i].pack('Q>')) ].pack('L>') rescue break
+  i += 1
+end
+
