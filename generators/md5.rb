@@ -4,4 +4,10 @@
 
 require 'digest/md5'
 
-(2**17).times { |i| print Digest::MD5.digest([i].pack('L>')) }
+Signal.trap("INT") { exit(0) }
+
+i = 0
+loop do
+  print Digest::MD5.digest([i].pack('Q>')) rescue break
+  i += 1
+end

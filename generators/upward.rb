@@ -7,10 +7,14 @@
 
 require 'digest/md5'
 
-(2**16).times do |i|
-  print Digest::MD5.digest([i].pack('L>'))
-  md5 = Digest::MD5.digest([i].pack('L<'))
+Signal.trap("INT") { exit(0) }
+
+i = 0
+loop do
+  print Digest::MD5.digest([i].pack('Q>'))
+  md5 = Digest::MD5.digest([i].pack('Q<'))
   msb = md5[0].ord
   md5[0] = ('%08b' % msb).reverse.to_i(2).chr if msb < 43
-  print md5
+  print md5 rescue break
+  i += 1
 end

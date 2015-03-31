@@ -10,5 +10,11 @@ def ecb(key, text)
   aes.update(text) << aes.final
 end
 
+Signal.trap("INT") { exit(0) }
+
 key = "\0" * 32
-(2**17).times { |i| print ecb(key, [i].pack('L>')) }
+i = 0
+loop do
+  print ecb(key, [i].pack('Q>')) rescue break
+  i += 1
+end
