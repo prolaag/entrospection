@@ -5,6 +5,9 @@ require 'chunky_png'
 
 class Entrospection
 
+  PROJ_ROOT = File.expand_path('../..', __FILE__)
+  GENERATOR_DIR = File.expand_path('lib/generators', PROJ_ROOT)
+
   def initialize(opts = {})
     @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
     @width = opts.fetch(:width, 1).to_i
@@ -219,6 +222,12 @@ class Entrospection
     end
     png
   end
+=begin
+  def self.generators_list
+    Dir.glob("#{GENERATOR_DIR}/*.rb").map do |file|
+      File.basename(file).split('.').first
+    end
+  end
 
   # Return a ChunkyPNG image graphing the four included pvalue results over time
   def pvalues_png
@@ -239,7 +248,7 @@ class Entrospection
 
 end
 
-
+=begin
 if $0 == __FILE__
   src = $stdin
   src = File.open(ARGV.first) if ARGV.first
@@ -253,3 +262,4 @@ if $0 == __FILE__
   end
   ent.pvalues_png.save('pvalues.png', :interlace => true)
 end
+=end
