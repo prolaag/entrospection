@@ -5,6 +5,9 @@ require 'chunky_png'
 
 class Entrospection
 
+  PROJ_ROOT = File.expand_path('../..', __FILE__)
+  GENERATOR_DIR = File.expand_path('lib/generators', PROJ_ROOT)
+
   def initialize(opts = {})
     @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
     @width = opts.fetch(:width, 1).to_i
@@ -219,10 +222,29 @@ class Entrospection
     end
     png
   end
+=begin
+  def self.generators_list
+    Dir.glob("#{GENERATOR_DIR}/*.rb").map do |file|
+      File.basename(file).split('.').first
+    end
+  end
 
+  def self.get_generator(name,copy_file = false)
+    src = File.expand_path("#{name}.rb", GENERATOR_DIR)
+    fail "#{src} does not exist" if !File.exist? file
+    FileUtils.cp src, File.expand_path("#{name}.rb", '/home/gbinion') if copy_file
+    descr = ''
+    File.read(file) do |line|
+      if line.match(/^#/) and !line.match(/^#\/usr/)
+        descr << line
+      end
+    end
+    descr
+  end
+=end
 end
 
-
+=begin
 if $0 == __FILE__
   src = $stdin
   src = File.open(ARGV.first) if ARGV.first
@@ -235,3 +257,4 @@ if $0 == __FILE__
     ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
   end
 end
+=end

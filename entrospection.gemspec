@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description   = ''
   s.files         = Dir.glob("{lib,data,bin,generators,test}/**/*") + %w(README.md)
 
-  s.executables   << 'entrospection'
+  s.executables   << 'entrospect'
 
   s.add_development_dependency 'bundler'
 
