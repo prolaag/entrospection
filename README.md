@@ -22,19 +22,21 @@ Or install it yourself as:
  
    Call the entropy generation tool 'entrogen' with the -g switch and redirect the output to a file.
 
-   $ entrogen -g GENERATOR_NAME > path-to-file
+    $ entrogen -g GENERATOR_NAME > path-to-file
+
+   Let the generator run for some amount of time accumulating data in the file. When you think you have collected sufficient data terminate the generator with CTRL-C.
 
 
 ### Analysing and Viewing the results
 
     $ entrospect -f <path-to-file>
 
-The output of entrospection are a number of ".png"s that can be opened individually or are displayed together via the report.html in a browser.
+The output of entrospect is a collection of ".png" files that can be opened individually or are displayed together via the report.html in a browser. Each ".png" is named for the test that create the chart which is that test's assessment of the data set.  See below for the list of tests.
 
-* binomial.png
-* bit.png
-* byte.png
-* covariance.png
-* gauss_sum.png
-* qindependence.png
-* runs.png
+* binomial
+* bit
+* byte
+* covariance
+* gauss_sum
+* qindependence
+* runs
