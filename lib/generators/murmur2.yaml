@@ -1,0 +1,3 @@
+---
+summary: pseudo-random sequence by Murmur2-hashing an integer counter
+description: This generates a pseudo-random sequence by Murmur2-hashing an integer counter. This hash is not designed to be cryptographically secure, but it does produce fairly uniform output, though the output of the "runs" test dips briefly into dangerous territory.

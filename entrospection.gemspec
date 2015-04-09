@@ -8,13 +8,12 @@ Gem::Specification.new do |s|
 
   s.summary       = 'Random number visualizer'
   s.description   = ''
-  s.files         = Dir.glob("{lib,data,bin,generators,test}/**/*") + %w(README.md)
+  s.files         = Dir.glob("{lib,data,bin,test}/**/*") + %w(README.md)
 
   s.executables   << 'entrospect'
+  s.executables   << 'entrogen'
 
   s.add_development_dependency 'bundler'
 
-#  s.add_runtime_dependency 'digest'
-#  s.add_runtime_dependency 'openssl'
   s.add_runtime_dependency 'chunky_png'
 end

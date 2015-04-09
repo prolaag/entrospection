@@ -1,12 +1,12 @@
 # entrospection
 
-Used to graphically demonstrate the quality of prolaag's entropy evaluations.
+Used to graphically demonstrate the quality of prolaag's entropy evaluations.  Several pseudo random number generators are provided as part of this gem. However, this tool can evaluate any data set to assess the quality of its randomness.  
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'entrospection'
+    gem 'prolaag-entrospection'
 
 And then execute:
 
@@ -14,16 +14,20 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install entrospection
+    $ gem install prolaag-entrospection
 
 ## Usage
 
-Create a data set from one of the random number routines, described below, or provide your own data set for evaluation. 
+### Generating data sets
+ 
+   Call the entropy generation tool 'entrogen' with the -g switch and redirect the output to a file.
+
+   $ entrogen -g GENERATOR_NAME > path-to-file
 
 
-    $ entrospection <path-to-file>
+### Analysing and Viewing the results
 
-## Viewing the results
+    $ entrospect -f <path-to-file>
 
 The output of entrospection are a number of ".png"s that can be opened individually or are displayed together via the report.html in a browser.
 
@@ -34,35 +38,3 @@ The output of entrospection are a number of ".png"s that can be opened individua
 * gauss_sum.png
 * qindependence.png
 * runs.png
-
-### Generating a data set
-
-  Several very simple random number generators have been provided.  Each script produces a stream that can be redirected to a file and then evaluated by entrospection.
-
-* aes_ecb.rb
-
-    generates a pseudo-random sequence by encrypting a simple counter with AES in ECB mode
-
-* counter.rb
-
-    interleaves a counter into the stream of random bytes
-    
-* lcg.rb
-
-    LCG (Linear congruential generator) pseudo-random number generator
-
-* md5.rb
-
-    creates a pseudo-random sequence by MD5-hashing an integer counter
-
-* murmur2.rb
-
-    pseudo-random sequence by Murmur2-hashing an integer counter
-
-* pruned_byte.rb
-
-    MD5 hash that produces a byte pattern that appears 15% less often than its counterparts
-
-* upward.rb
-
-    a pseudo-random sequence created by MD5-hashing an integer counter, but nudges 0.5% of the bytes updwards to produce demonstrable skew
