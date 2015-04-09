@@ -1,0 +1,3 @@
+---
+summary: creates a pseudo-random sequence by MD5-hashing an integer counter
+description: This generates a pseudo-random sequence by MD5-hashing an integer counter.

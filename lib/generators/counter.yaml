@@ -1,0 +1,3 @@
+---
+summary: interleaves a counter into the stream of random bytes
+description: This test shows that our statistical analysis of entropy can detect something like a counter (which clearly has an even distribution of bits and bytes) interleaved into the stream of random bytes. This case demonstrates the utility of the "runs" test.

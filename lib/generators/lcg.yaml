@@ -1,0 +1,3 @@
+---
+summary: LCG (Linear congruential generator) pseudo-random number generator
+description: lcg.rb:# This test shows that LCG (Linear congruential generator) pseudo-random number generation produces output that can be detected as non-random by the inline statistical tests. This case demonstrates the utility of the "q-independence" test.
