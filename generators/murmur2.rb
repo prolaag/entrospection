@@ -5,6 +5,8 @@
 # fairly uniform output, though the output of the "runs" test dips briefly
 # into dangerous territory.
 
+require_relative 'generator.rb'
+
 # Code shamelessly adapted from:
 # http://toblog.bryans.org/2010/12/14/pure-ruby-version-of-murmurhash-2-0
 def murmur_hash2(txt)
@@ -46,11 +48,9 @@ def murmur_hash2(txt)
   return h
 end
 
-Signal.trap("INT") { exit(0) }
-
 i = 0
 loop do
-  print [ murmur_hash2([i].pack('Q>')) ].pack('L>') rescue break
+  gprint [ murmur_hash2([i].pack('Q>')) ].pack('L>')
   i += 1
 end
 

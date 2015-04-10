@@ -5,16 +5,14 @@
 
 # This case demonstrates the utility of the "runs" test.
 
-require 'digest/md5'
-
-Signal.trap("INT") { exit(0) }
+require_relative 'generator.rb'
 
 i = 0
 loop do
-  print Digest::MD5.digest([i].pack('Q>'))
+  gprint Digest::MD5.digest([i].pack('Q>'))
   md5 = Digest::MD5.digest([i].pack('Q<'))
   msb = md5[0].ord
   md5[0] = ('%08b' % msb).reverse.to_i(2).chr if msb < 43
-  print md5 rescue break
+  gprint md5
   i += 1
 end
