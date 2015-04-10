@@ -48,9 +48,16 @@ def murmur_hash2(txt)
   return h
 end
 
+limit = ARGV.first.to_i
+bytes_max = limit ? limit : 0
+bytes = 0
+
 i = 0
 loop do
-  gprint [ murmur_hash2([i].pack('Q>')) ].pack('L>')
+  data = [ murmur_hash2([i].pack('Q>')) ].pack('L>') rescue break
+  gprint data
+  bytes += data.length
+  break if bytes > bytes_max
   i += 1
 end
 

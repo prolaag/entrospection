@@ -2,70 +2,40 @@
 # encoding: ASCII-8BIT
 
 require 'optparse'
+require_relative '../lib/entrospection.rb'
 
 PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
-require_relative '../lib/entrospection.rb'
 
-OPTIONS = {}
+def usage
+  msg =<<-HERE
+  Usage: #{File.basename($0)} <path-to-file>
 
-def generators_summary
-  generators = Entrospection.generators_list
-  max_len = generators.map(&:length).max
-  generators.map do |type|
-    descr = Pcapinator.get_generator(generator)
-    "#{generator} #{' ' * (max_len - type.length)}- #{descr}"
-  end
-end
+      or pipe some stream into #{File.basename($0)}
 
-
-opts = {}
-parser = OptionParser.new do |options|
-  options.banner =<<-HERE
-  Usage: ./#{File.basename($0)} [options]
-
-  Options:
+         <some-stream> | #{File.basename($0)}
   HERE
+  puts msg
+  exit 0
+end
 
-  options.on("-f", "--data-file FILE", "File path for a data set ") do |f|
-    opts[:data_set] = f
+if __FILE__.strip.split('/').last == $0.strip.split('/').last
+  usage if ARGV.first == '-h'
+  src = $stdin
+  src = File.open(ARGV.first) if ARGV.first
+  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
+  begin
+    ent << src
+  rescue Exception => e
+    puts "Stream terminated, saving analysis..."
+  ensure
+    ent.covariance_png.save('covariance.png', :interlace => true)
+    ent.byte_png.save('byte.png', :interlace => true)
+    ent.bit_png.save('bit.png', :interlace => true)
+    ent.pvalue.each_key do |pt|
+      ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
+    end
+    cmd =  "cp #{PROJECT_DIR}/lib/report.html ."
+    system( cmd )
   end
-
-  options.on("-h", "--help", "Show this help") do
-    puts options
-    exit
-  end
-
 end
-
-begin
-  parser.parse!
-rescue OptionParser::MissingArgument => e
-  puts parser
-  exit 1
-end
-
-opts = OPTIONS.merge(opts)
-# If user supplied a data set, use that
-if opts[:data_set]
-  config = opts[:data_set]
-
-else
-  puts parser
-  exit 1
-end
-
-#if $0 == __FILE__
-#  src = $stdin
-#  src = File.open(ARGV.first) if ARGV.first
-src = File.open(opts[:data_set])
-ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
-ent << src
-ent.covariance_png.save('covariance.png', :interlace => true)
-ent.byte_png.save('byte.png', :interlace => true)
-ent.bit_png.save('bit.png', :interlace => true)
-ent.pvalue.each_key do |pt|
-  ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-end
-#end
-

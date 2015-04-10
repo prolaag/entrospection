@@ -19,8 +19,8 @@ end
 opts = {}
 parser = OptionParser.new do |options|
   options.banner =<<-HERE
-  Usage: ./#{File.basename($0)} [options] > <path-to-file>
-   ctrl-c to terminate
+  Usage: ./#{File.basename($0)} [options] | entrospect
+         ./#{File.basename($0)} [options] > <path-to-file> 
 
   Canned Generators:
     - #{generators_summary.join("\n    - ")}
@@ -29,8 +29,14 @@ parser = OptionParser.new do |options|
   HERE
 
   options.on("-g", "--generator GENERATOR",
-             "generator to use for streaming pseudo random data") do |g|
+             "name of generator to use for streaming pseudo random data") do |g|
     opts[:generator] = g
+  end
+
+  options.on("-l", "--limit nnn",
+             "stop generation after stream exceeds nnn bytes\n" +
+             "\t\t\t\t     (CTRL-C to terminate if a limit option is not given)" ) do |l|
+    opts[:limit] = l
   end
 
   options.on("-h", "--help", "Show this help") do
@@ -40,7 +46,6 @@ parser = OptionParser.new do |options|
 
 end
 
-# raise OptionParser::MissingArgument if opts[:generator].nil?
 begin
   parser.parse!
 rescue OptionParser::MissingArgument => e
@@ -53,6 +58,4 @@ unless opts[:generator]
   exit 1
 end
 
-#exit 0 unless opts[:config_file] || opts[:canned_type]
-#puts opts
-Generators.run(opts[:generator])
+Generators.run(opts)

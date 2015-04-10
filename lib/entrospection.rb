@@ -222,12 +222,6 @@ class Entrospection
     end
     png
   end
-=begin
-  def self.generators_list
-    Dir.glob("#{GENERATOR_DIR}/*.rb").map do |file|
-      File.basename(file).split('.').first
-    end
-  end
 
   # Return a ChunkyPNG image graphing the four included pvalue results over time
   def pvalues_png
@@ -247,19 +241,3 @@ class Entrospection
   end
 
 end
-
-=begin
-if $0 == __FILE__
-  src = $stdin
-  src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
-  ent << src
-  ent.covariance_png.save('covariance.png', :interlace => true)
-  ent.byte_png.save('byte.png', :interlace => true)
-  ent.bit_png.save('bit.png', :interlace => true)
-  ent.pvalue.each_key do |pt|
-    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-  end
-  ent.pvalues_png.save('pvalues.png', :interlace => true)
-end
-=end
