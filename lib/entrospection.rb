@@ -207,7 +207,7 @@ class Entrospection
     png
   end
 
-  # Return a ChunkyPNG image graphing the provided pvalue over time
+  # Return a ChunkyPNG image graphing the only the provided pvalue over time
   def pvalue_png(dist = :binomial)
     png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
     256.times do |x|
@@ -215,6 +215,23 @@ class Entrospection
       y = Math.log(pos * 1000000) * 25 - 90
       [ y, 3 ].max.to_i.times do |h|
         png[x, 255 - h] = ChunkyPNG::Color.rgba(255 - h, h, 0, 0xFF)
+      end
+    end
+    png
+  end
+
+  # Return a ChunkyPNG image graphing the four included pvalue results over time
+  def pvalues_png
+    png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
+    [ :binomial, :qindependence, :gauss_sum, :runs ].each_with_index do |t, i|
+      256.times do |x|
+        pos = @pvalue[t][x * @pvalue[t].length / 256]
+        y = Math.log(pos * 1000000) * 6.0 - 22
+        [ y, 3 ].max.to_i.times do |h|
+          scale = [y, 3].max.to_i + h * 3
+          color = ChunkyPNG::Color.rgba(255 - scale, scale, 0, 0xFF)
+          png[x, 255 - h - 64 * i] = color
+        end
       end
     end
     png
@@ -234,4 +251,5 @@ if $0 == __FILE__
   ent.pvalue.each_key do |pt|
     ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
   end
+  ent.pvalues_png.save('pvalues.png', :interlace => true)
 end

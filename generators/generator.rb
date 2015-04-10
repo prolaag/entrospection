@@ -28,3 +28,5 @@ def gprint(raw)
     Kernel.exit(0)
   end
 end
+
+raise "not a generator" if $0 == __FILE__
