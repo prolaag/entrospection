@@ -1,6 +1,6 @@
 # entrospection
 
-Used to graphically demonstrate the quality of prolaag's entropy evaluations.  Several pseudo random number generators are provided as part of this gem. However, this tool can evaluate any data set to assess the quality of its randomness.  
+This gem is used to graphically demonstrate the quality of prolaag's entropy evaluations.  It comes with two executables entrogen and entrospect. engtrogen is the CLI to several pseudo random number generators. entrospect analyses and produces a report to describe the quality of how random a data set is.  While entrospect was developed for testing random number sequences, it can evaluate any stream of data. See how random that jpeg of you significant other actually is.
 
 ## Installation
 
@@ -22,17 +22,21 @@ Or install it yourself as:
  
    Call the entropy generation tool 'entrogen' with the -g switch and redirect the output to a file.
 
-    $ entrogen -g GENERATOR_NAME > path-to-file
+    $ entrogen -g GENERATOR_NAME -l nnn > path-to-file
 
-   Let the generator run for some amount of time accumulating data in the file. When you think you have collected sufficient data terminate the generator with CTRL-C.
+       GENERATOR   the name of one of the pseudo random number generators provided in the gem. 
+
+       nnn         specifies a limit in bytes to afterwhich the stream terminates.
+                   when no limit is provided the generator will stream indefinitely.
 
 
 ### Analysing and Viewing the results
 
-    $ entrospect -f <path-to-file>
+    $ entrospect <path-to-file>
 
-The output of entrospect is a collection of ".png" files that can be opened individually or are displayed together via the report.html in a browser. Each ".png" is named for the test that create the chart which is that test's assessment of the data set.  See below for the list of tests.
+The output of entrospect is a collection of ".png" files and a simple html report that can be opened in a browser. Each ".png" is named for the test that created the chart.
 
+The list of tests.
 * binomial
 * bit
 * byte

@@ -12,12 +12,18 @@ require 'digest/md5'
 
 Signal.trap("INT") { exit(0) }
 
+limit = ARGV.first.to_i
+bytes_max = limit ? limit : 0
+bytes = 0
+
 i = s = 0
 loop do
   s = (s * 6364136223846793005 + 1442695040888963407) % 2**64
   raw = Digest::MD5.digest(s.to_s)
   raw.delete!('e') if i % 7 == 0
   print(raw) rescue break
+  bytes += raw.length
+  break if bytes > bytes_max
   i += 1
 end
 

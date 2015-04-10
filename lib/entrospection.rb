@@ -222,39 +222,4 @@ class Entrospection
     end
     png
   end
-=begin
-  def self.generators_list
-    Dir.glob("#{GENERATOR_DIR}/*.rb").map do |file|
-      File.basename(file).split('.').first
-    end
-  end
-
-  def self.get_generator(name,copy_file = false)
-    src = File.expand_path("#{name}.rb", GENERATOR_DIR)
-    fail "#{src} does not exist" if !File.exist? file
-    FileUtils.cp src, File.expand_path("#{name}.rb", '/home/gbinion') if copy_file
-    descr = ''
-    File.read(file) do |line|
-      if line.match(/^#/) and !line.match(/^#\/usr/)
-        descr << line
-      end
-    end
-    descr
-  end
-=end
 end
-
-=begin
-if $0 == __FILE__
-  src = $stdin
-  src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
-  ent << src
-  ent.covariance_png.save('covariance.png', :interlace => true)
-  ent.byte_png.save('byte.png', :interlace => true)
-  ent.bit_png.save('bit.png', :interlace => true)
-  ent.pvalue.each_key do |pt|
-    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-  end
-end
-=end

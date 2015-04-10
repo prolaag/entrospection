@@ -23,8 +23,8 @@ module Generators
     [data.delete('summary')]
   end
 
-  def self.run(name)
-    cmd = File.expand_path("#{name}.rb", GENERATOR_DIR)
+  def self.run(opts)
+    cmd = "#{File.expand_path("#{opts[:generator]}.rb", GENERATOR_DIR)} #{opts[:limit]}"
     exec(cmd)
   end
 

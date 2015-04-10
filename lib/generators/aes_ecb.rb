@@ -10,11 +10,17 @@ def ecb(key, text)
   aes.update(text) << aes.final
 end
 
+limit = ARGV.first.to_i
+bytes_max = limit ? limit : 0
+bytes = 0
 Signal.trap("INT") { exit(0) }
 
 key = "\0" * 32
 i = 0
 loop do
-  print ecb(key, [i].pack('Q>')) rescue break
+  data = ecb(key, [i].pack('Q>')) rescue break
+  print data
+  bytes += data.length
   i += 1
+  break if bytes > bytes_max
 end
