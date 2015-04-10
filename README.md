@@ -31,8 +31,13 @@ Or install it yourself as:
 
 
 ### Analysing and Viewing the results
-
+    Either call entrospect and provide the name of a file
+    
     $ entrospect <path-to-file>
+    
+    or use entrogen to generate a stream that is piped into entrogen
+    
+    $ entrogen -g md5 -l 10485760 | entrospect
 
 The output of entrospect is a collection of ".png" files and a simple html report that can be opened in a browser. Each ".png" is named for the test that created the chart.
 
