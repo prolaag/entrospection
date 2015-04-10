@@ -6,7 +6,7 @@
 
 # This case demonstrates the utility of the "runs" test.
 
-Signal.trap("INT") { exit(0) }
+require_relative 'generator.rb'
 
 lcg = 0
 i = 0
@@ -15,5 +15,5 @@ loop do
   skip = (i + skip) % 17 + 1
   lcg = (lcg * 6364136223846793005 + 1442695040888963407) % 2**64
   i += skip
-  print((i % 256).chr + [lcg].pack('Q>')) rescue break
+  gprint((i % 256).chr + [lcg].pack('Q>'))
 end

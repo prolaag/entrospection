@@ -6,11 +6,11 @@
 
 # This case demonstrates the utility of the "q-independence" test.
 
-Signal.trap("INT") { exit(0) }
+require_relative 'generator.rb'
 
 i = 0
 loop do
   i = (i * 6364136223846793005 + 1442695040888963407) % 2**64
-  print([i].pack('Q>')) rescue break
+  gprint([i].pack('Q>'))
 end
 

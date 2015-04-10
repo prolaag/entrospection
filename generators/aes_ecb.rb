@@ -3,6 +3,7 @@
 # This test generates a pseudo-random sequence by encrypting a simple counter
 # with AES in ECB mode.
 
+require_relative 'generator.rb'
 require 'openssl'
 
 def ecb(key, text)
@@ -10,11 +11,9 @@ def ecb(key, text)
   aes.update(text) << aes.final
 end
 
-Signal.trap("INT") { exit(0) }
-
 key = "\0" * 32
 i = 0
 loop do
-  print ecb(key, [i].pack('Q>')) rescue break
+  gprint ecb(key, [i].pack('Q>'))
   i += 1
 end

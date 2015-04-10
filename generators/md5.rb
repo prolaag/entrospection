@@ -2,12 +2,10 @@
 
 # This generates a pseudo-random sequence by MD5-hashing an integer counter.
 
-require 'digest/md5'
-
-Signal.trap("INT") { exit(0) }
+require_relative 'generator.rb'
 
 i = 0
 loop do
-  print Digest::MD5.digest([i].pack('Q>')) rescue break
+  gprint Digest::MD5.digest([i].pack('Q>'))
   i += 1
 end

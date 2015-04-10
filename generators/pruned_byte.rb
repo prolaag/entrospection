@@ -8,16 +8,14 @@
 # image. The octet 'e' (0b1100101) was chosen because it contains an equal
 # number of set and unset bits.
 
-require 'digest/md5'
-
-Signal.trap("INT") { exit(0) }
+require_relative 'generator.rb'
 
 i = s = 0
 loop do
   s = (s * 6364136223846793005 + 1442695040888963407) % 2**64
   raw = Digest::MD5.digest(s.to_s)
   raw.delete!('e') if i % 7 == 0
-  print(raw) rescue break
+  gprint(raw)
   i += 1
 end
 
