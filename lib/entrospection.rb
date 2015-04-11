@@ -5,6 +5,9 @@ require 'chunky_png'
 
 class Entrospection
 
+  PROJ_ROOT = File.expand_path('../..', __FILE__)
+  GENERATOR_DIR = File.expand_path('lib/generators', PROJ_ROOT)
+
   def initialize(opts = {})
     @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
     @width = opts.fetch(:width, 1).to_i
@@ -237,19 +240,4 @@ class Entrospection
     png
   end
 
-end
-
-
-if $0 == __FILE__
-  src = $stdin
-  src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
-  ent << src
-  ent.covariance_png.save('covariance.png', :interlace => true)
-  ent.byte_png.save('byte.png', :interlace => true)
-  ent.bit_png.save('bit.png', :interlace => true)
-  ent.pvalue.each_key do |pt|
-    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-  end
-  ent.pvalues_png.save('pvalues.png', :interlace => true)
 end

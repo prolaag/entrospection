@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'optparse'
+require_relative '../lib/generators'
+
+PROJECT_DIR = File.expand_path('../..', __FILE__)
+$LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
+
+def generators_summary
+  generators = Generators.list_generators
+  max_len = generators.map(&:length).max
+  generators.map do |generator|
+    descr = Generators.get_generator_description(generator)[0]
+    "#{generator} #{' ' * (max_len - generator.length)}- #{descr}"
+  end
+end
+
+opts = {}
+parser = OptionParser.new do |options|
+  options.banner =<<-HERE
+  Usage: ./#{File.basename($0)} [options] | entrospect
+         ./#{File.basename($0)} [options] > <path-to-file> 
+
+  Canned Generators:
+    - #{generators_summary.join("\n    - ")}
+
+  Options:
+  HERE
+
+  options.on("-g", "--generator GENERATOR",
+             "name of generator to use for streaming pseudo random data") do |g|
+    opts[:generator] = g
+  end
+
+  options.on("-l", "--limit nnn",
+             "stop generation after stream exceeds nnn bytes\n" +
+             "\t\t\t\t     (CTRL-C to terminate if a limit option is not given)" ) do |l|
+    opts[:limit] = l
+  end
+
+  options.on("-h", "--help", "Show this help") do
+    puts options
+    exit
+  end
+
+end
+
+begin
+  parser.parse!
+rescue OptionParser::MissingArgument => e
+  puts parser
+  exit 1
+end
+
+unless opts[:generator]
+  puts parser
+  exit 1
+end
+
+Generators.run(opts)
