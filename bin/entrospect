@@ -37,5 +37,6 @@ if __FILE__.strip.split('/').last == $0.strip.split('/').last
     end
     cmd =  "cp #{PROJECT_DIR}/lib/report.html ."
     system( cmd )
+    ent.pvalues_png.save('pvalues.png', :interlace => true)
   end
 end
