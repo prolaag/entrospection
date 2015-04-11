@@ -12,6 +12,10 @@ limit = ARGV.first.to_i
 bytes_max = limit ? limit : 0
 bytes = 0
 
+limit = ARGV.first.to_i
+bytes_max = limit ? limit : 0
+bytes = 0
+
 lcg = 0
 i = 0
 skip = 0

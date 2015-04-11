@@ -1,6 +1,6 @@
 # entrospection
 
-This gem is used to graphically demonstrate the quality of prolaag's entropy evaluations.  It comes with two executables entrogen and entrospect. engtrogen is the CLI to several pseudo random number generators. entrospect analyses and produces a report to describe the quality of how random a data set is.  While entrospect was developed for testing random number sequences, it can evaluate any stream of data. See how random that jpeg of you significant other actually is.
+This gem is used to graphically demonstrate the quality of prolaag's entropy evaluations.  It comes with two executables entrogen and entrospect. engtrogen is the CLI to several pseudo random number generators. entrospect analyzes and produces a report to describe the quality of how random a data set is.  While entrospect was developed for testing random number sequences, it can evaluate any stream of data. See how random that jpeg of you significant other actually is.
 
 ## Installation
 
@@ -31,8 +31,13 @@ Or install it yourself as:
 
 
 ### Analysing and Viewing the results
-
+    Either call entrospect and provide the name of a file
+    
     $ entrospect <path-to-file>
+    
+    or use entrogen to generate a stream that is piped into entrogen
+    
+    $ entrogen -g md5 -l 10485760 | entrospect
 
 The output of entrospect is a collection of ".png" files and a simple html report that can be opened in a browser. Each ".png" is named for the test that created the chart.
 

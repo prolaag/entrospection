@@ -11,6 +11,10 @@ limit = ARGV.first.to_i
 bytes_max = limit ? limit : 0
 bytes = 0
 
+limit = ARGV.first.to_i
+bytes_max = limit ? limit : 0
+bytes = 0
+
 i = 0
 loop do
   gprint Digest::MD5.digest([i].pack('Q>'))
