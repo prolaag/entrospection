@@ -11,7 +11,7 @@ def generators_summary
   generators = Generator.list_generators
   max_len = generators.map(&:length).max
   generators.map do |generator|
-    descr = Generator.description(generator)[0]
+    descr = Generator.summary(generator)
     "#{generator} #{' ' * (max_len - generator.length)}- #{descr}"
   end
 end

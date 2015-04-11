@@ -15,8 +15,13 @@ module Generator
   def self.description(name)
     file = File.expand_path("#{name}.yaml", GENERATOR_DIR)
     fail "#{file} does not exist" unless File.exist? file
-    data = YAML.load(File.read(file))
-    [data.delete('summary')]
+    YAML.load(File.read(file))['description']
+  end
+
+  def self.summary(name)
+    file = File.expand_path("#{name}.yaml", GENERATOR_DIR)
+    fail "#{file} does not exist" unless File.exist? file
+    YAML.load(File.read(file))['summary']
   end
 
   def self.run(opts)
