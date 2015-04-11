@@ -16,7 +16,7 @@ module Generators
   # Input: the name of a generator
   # Output: [description]
   #
-  def self.get_generator_description(name)
+  def self.description(name)
     file = File.expand_path("#{name}.yaml", GENERATOR_DIR)
     fail "#{file} does not exist" if !File.exist? file
     data = YAML.load(File.read(file))
