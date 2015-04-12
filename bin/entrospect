@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 # encoding: ASCII-8BIT
 
-require 'optparse'
-require_relative '../lib/entrospection.rb'
-
 PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
+
+require 'entrospection.rb'
 
 def usage
   msg =<<-HERE
@@ -19,24 +18,25 @@ def usage
   exit 0
 end
 
-if __FILE__.strip.split('/').last == $0.strip.split('/').last
-  usage if ARGV.first == '-h'
-  src = $stdin
-  src = File.open(ARGV.first) if ARGV.first
-  ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
-  begin
-    ent << src
-  rescue Exception => e
-    puts "Stream terminated, saving analysis..."
-  ensure
-    ent.covariance_png.save('covariance.png', :interlace => true)
-    ent.byte_png.save('byte.png', :interlace => true)
-    ent.bit_png.save('bit.png', :interlace => true)
-    ent.pvalue.each_key do |pt|
-      ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-    end
-    cmd =  "cp #{PROJECT_DIR}/lib/report.html ."
-    system( cmd )
-    ent.pvalues_png.save('pvalues.png', :interlace => true)
+usage if ARGV.first == '-h'
+src = $stdin
+src = File.open(ARGV.first) if ARGV.first
+ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
+begin
+  ent << src
+rescue Exception => e
+  $stderr.puts "Stream terminated, saving analysis..."
+ensure
+  ent.covariance_png.save('covariance.png', :interlace => true)
+  ent.byte_png.save('byte.png', :interlace => true)
+  ent.bit_png.save('bit.png', :interlace => true)
+  ent.pvalue.each_key do |pt|
+    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
   end
+  ent.pvalues_png.save('pvalues.png', :interlace => true)
+
+  # This is going to need to be cleaned up, but I'm deferring because we'll
+  # probably want to use ERB to modify the file contents to contain metadata.
+  cmd =  "cp #{PROJECT_DIR}/lib/report.html ."
+  system( cmd )
 end
