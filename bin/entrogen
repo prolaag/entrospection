@@ -5,7 +5,8 @@ $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
 require 'yaml'
 require 'optparse'
-require 'generator'
+
+Signal.trap("INT") { exit(0) }
 
 def generators_summary
   generators = Generator.list_generators
@@ -35,8 +36,9 @@ parser = OptionParser.new do |options|
 
   options.on("-l", "--limit nnn",
              "stop generation after stream exceeds nnn bytes\n" +
-             "\t\t\t\t     (CTRL-C to terminate if a limit option is not given)" ) do |l|
-    opts[:limit] = l
+             "\t\t\t\t    (CTRL-C to terminate)" ) do |l|
+    unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[l[-1].downcase]
+    opts[:limit] = l.to_i * (unit || 1)
   end
 
   options.on("-h", "--help", "Show this help") do
