@@ -1,3 +1,0 @@
----
-summary: pseudo-random sequence by encrypting a counter with AES in ECB mode.
-description: This test generates a pseudo-random sequence by encrypting a simple counter with AES in ECB mode.

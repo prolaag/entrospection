@@ -19,6 +19,19 @@ class AesEcbGenerator < Generator
     @i = 0
   end
 
+  def summary
+    "A Pseudo-random sequence by encrypting a counter with AES in ECB mode."
+  end
+
+  def description
+    desc = <<-DESC_END
+    This generatior produces a pseudo-random sequence by encrypting a simple counter
+    with AES in ECB mode."
+    DESC_END
+    desc.gsub(/\s+/, " ").strip
+  end
+
+
   def next_chunk
     @i += 1
     ecb(@key, [@i].pack('Q>'))

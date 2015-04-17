@@ -1,3 +1,0 @@
----
-summary: a pseudo-random sequence that nudges 0.5% of the bytes updwards to produce demonstrable skew
-description: This generates a pseudo-random sequence by MD5-hashing an integer counter, but nudges 0.5% of the bytes updwards to produce demonstrable skew. This case demonstrates the utility of the "runs" test.
