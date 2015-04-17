@@ -1,12 +1,12 @@
 Gem::Specification.new do |s|
-  s.name          = 'prolaag-entrospection'
+  s.name          = 'entrospection'
   s.version       = '0.0.1'
-  s.authors       = ['Eric Davidson']
-  s.email         = ['edavidson@prolaag.com']
+  s.authors       = ['Prolaag']
+  s.email         = ['prolaag@gmail.com']
 
   s.homepage      = 'https://github.com/prolaag/entrospection'
 
-  s.summary       = 'Random number visualizer'
+  s.summary       = 'Visualize statistical properties of RNGs'
   s.description   = ''
   s.files         = Dir.glob("{lib,data,bin,test}/**/*") + %w(README.md)
 
