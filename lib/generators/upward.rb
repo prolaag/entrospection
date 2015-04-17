@@ -32,12 +32,11 @@ class UpwardGenerator < Generator
 
   def next_chunk
     @i += 1
-    ret = ''
-    ret << Digest::MD5.digest([@i].pack('Q>'))
-    md5 = Digest::MD5.digest([@i].pack('Q<'))
-    msb = md5[0].ord
-    ret << md5[0] = ('%08b' % msb).reverse.to_i(2).chr if msb < 43
-    ret
+    pristine = Digest::MD5.digest([@i].pack('Q>'))
+    nudged = Digest::MD5.digest([@i].pack('Q<'))
+    msb = nudged[0].ord
+    nudged[0] = ('%08b' % msb).reverse.to_i(2).chr if msb < 43
+    pristine << nudged
   end
 
 end

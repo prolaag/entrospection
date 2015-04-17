@@ -30,7 +30,6 @@ class CounterGenerator < Generator
     desc.gsub(/\s+/, " ").strip
   end
 
-
   def next_chunk
     @skip = (@i + @skip) % 17 + 1
     @lcg = (@lcg * 6364136223846793005 + 1442695040888963407) % 2**64
