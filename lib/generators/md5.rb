@@ -2,17 +2,34 @@
 
 # This generates a pseudo-random sequence by MD5-hashing an integer counter.
 
-require_relative 'generator.rb'
+require_relative '../generator.rb'
+require 'digest/md5'
 
-limit = ARGV.first.to_i
-bytes_max = limit ? limit : 0
-bytes = 0
+class Md5Generator < Generator
 
-i = 0
-loop do
-  data = Digest::MD5.digest([i].pack('Q>'))
-  gprint data
-  bytes += data.length
-  break if bytes > bytes_max
-  i += 1
+  def initialize(*args)
+    super(*args)
+    @i = 0
+  end
+
+  def summary
+    "A pseudo-random sequence by MD5-hashing an integer counter"
+  end
+
+  def description
+    desc = <<-DESC_END
+      This generates a pseudo-random sequence by MD5-hashing an integer counter.
+    DESC_END
+    desc.gsub(/\s+/, " ").strip
+  end
+
+
+  def next_chunk
+    @i += 1
+    Digest::MD5.digest([@i].pack('Q>'))
+  end
+
 end
+
+Md5Generator.run if __FILE__ == $0
+
