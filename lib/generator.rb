@@ -1,6 +1,13 @@
 #!/usr/bin/env ruby
 # encoding: ASCII-8BIT
 
+# This is the base class from which all Entrospection generators are derived.
+# Each generator subclass must define one method, .next_chunk(), which should
+# return the next chunk of deterministic random data as an ASCII-8BIT encoded
+# String with length > 0. After this method is defined, the resulting objects
+# will weakly mimic a read-only IO object, supporting read(), readpartial(),
+# readchar(), readbyte(), each(), each_char(), and each_byte().
+
 class Generator
 
   def initialize(limit = Float::INFINITY)
