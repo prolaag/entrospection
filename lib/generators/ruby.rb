@@ -17,7 +17,8 @@ class RubyGenerator < Generator
 
   def description
     desc = <<-DESC_END
-      TBD
+      This generator uses Ruby's built-in PRNG with a deterministic seed to
+      produce data.
     DESC_END
     desc.gsub(/\s+/, " ").strip
   end
