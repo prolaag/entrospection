@@ -11,11 +11,11 @@ class RubyGenerator < Generator
     @r = Random.new(5)  # chosen by fair dice roll
   end
 
-  def summary
-    "A ruby pseudo random stream"
+  def self.summary
+    "Ruby's built-in pseudo random number generator"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
       This generator uses Ruby's built-in PRNG with a deterministic seed to
       produce data.

@@ -3,40 +3,45 @@
 PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
-require 'yaml'
 require 'optparse'
 
 Signal.trap("INT") { exit(0) }
 
-def generators_summary
-  generators = Generator.list_generators
-  max_len = generators.map(&:length).max
+# Require and return a list of all canned generators
+def load_generators
+  klasses = Module.constants
+  gen = Dir.glob(File.join(PROJECT_DIR, 'lib', 'generators', '*.rb'))
+  gen.each { |g| require g }
+  klasses = (Module.constants - klasses).map { |k| Kernel.const_get(k) }
+  klasses.select { |k| k.class == Class and k.superclass == Generator }
+end
+
+def summaries_for(generators)
   generators.map do |generator|
-    descr = Generator.summary(generator)
-    "#{generator} #{' ' * (max_len - generator.length)}- #{descr}"
+    name = generator.to_s.sub('Generator', '')
+    "#{name}#{' ' * (14 - name.length)}- #{generator.summary}"
   end
 end
+
+generators = load_generators()
 
 opts = {}
 parser = OptionParser.new do |options|
   options.banner =<<-HERE
-  Usage: ./#{File.basename($0)} [options] | entrospect
-         ./#{File.basename($0)} [options] > <path-to-file> 
+Usage: ./#{File.basename($0)} [options] | entrospect
+       ./#{File.basename($0)} [options] > <path-to-file> 
 
-  Available Generators:
-    - #{generators_summary.join("\n    - ")}
+Available Generators:
+   - #{summaries_for(generators).join("\n   - ")}
 
-  Options:
-  HERE
+Options:
+HERE
 
-  options.on("-g", "--generator GENERATOR",
-             "name of generator to use for streaming pseudo random data") do |g|
+  options.on("-g", "--generator GENERATOR", "name of generator") do |g|
     opts[:generator] = g
   end
 
-  options.on("-l", "--limit nnn",
-             "stop generation after stream exceeds nnn bytes\n" +
-             "\t\t\t\t    (CTRL-C to terminate)" ) do |l|
+  options.on("-l", "--limit n[K|M|G]", "generate exactly n bytes") do |l|
     unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[l[-1].downcase]
     opts[:limit] = l.to_i * (unit || 1)
   end
@@ -50,14 +55,12 @@ end
 
 begin
   parser.parse!
+  klass = generators.find do |k|
+    k.to_s.downcase == opts[:generator].downcase + 'generator'
+  end
 rescue OptionParser::MissingArgument => e
   puts parser
   exit 1
 end
 
-unless opts[:generator]
-  puts parser
-  exit 1
-end
-
-Generator.run(opts)
+klass.new(opts[:limit] || Float::INFINITY).pipe_to($stdout)

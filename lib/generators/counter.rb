@@ -17,11 +17,11 @@ class CounterGenerator < Generator
     @skip = 0
   end
 
-  def summary
-    "Interleaves a counter into the stream of random bytes"
+  def self.summary
+    "Interleaved counter in a stream of LCG output"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
     This generator interleaves a counter, which clearly has an even
     distribution of bits and bytes, into the stream of random bytes. 

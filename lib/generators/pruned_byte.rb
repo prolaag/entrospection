@@ -19,11 +19,11 @@ class PrunedByteGenerator < Generator
     @s = 0
   end
 
-  def summary
-    "Produces a byte pattern that appears 15% less often than its counterparts"
+  def self.summary
+    "MD5 data with one byte appearing 15% less often"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
       This generator shows that our inline statistical tests easily catch
       something like a particular byte pattern that appears 15% less often 

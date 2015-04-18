@@ -19,11 +19,11 @@ class AesEcbGenerator < Generator
     @i = 0
   end
 
-  def summary
-    "A Pseudo-random sequence by encrypting a counter with AES in ECB mode."
+  def self.summary
+    "AES encryption of a counter in ECB mode"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
     This generatior produces a pseudo-random sequence by encrypting a simple counter
     with AES in ECB mode."
