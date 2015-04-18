@@ -16,11 +16,11 @@ class LcgGenerator < Generator
      @i = 0
   end
 
-  def summary
-    "A linear congruential generator pseudo-random number generator"
+  def self.summary
+    "64-bit linear congruential generator (LCG)"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
     The LCG pseudo-random number generatior produces output that can be detected as 
     non-random by the inline statistical tests. This emonstrates the utility of

@@ -15,11 +15,11 @@ class UpwardGenerator < Generator
     @i = 0
   end
 
-  def summary
-    "A pseudo-random sequence that nudges 0.5% of the bytes updwards to produce demonstrable skew"
+  def self.summary
+    "MD5 output skewed towards higher byte values"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
        This generates a pseudo-random sequence by MD5-hashing 
        an integer counter, but nudges 0.5% of the bytes updwards 
@@ -28,7 +28,6 @@ class UpwardGenerator < Generator
     DESC_END
     desc.gsub(/\s+/, " ").strip
   end
-
 
   def next_chunk
     @i += 1

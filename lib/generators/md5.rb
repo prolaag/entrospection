@@ -12,17 +12,16 @@ class Md5Generator < Generator
     @i = 0
   end
 
-  def summary
-    "A pseudo-random sequence by MD5-hashing an integer counter"
+  def self.summary
+    "MD5-hash of an integer counter"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
       This generates a pseudo-random sequence by MD5-hashing an integer counter.
     DESC_END
     desc.gsub(/\s+/, " ").strip
   end
-
 
   def next_chunk
     @i += 1

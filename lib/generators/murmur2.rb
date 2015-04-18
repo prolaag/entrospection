@@ -14,11 +14,11 @@ class Murmur2Generator < Generator
     @i = 0
   end
 
-  def summary
-    "A pseudo-random sequence by Murmur2-hashing an integer counter"
+  def self.summary
+    "Murmur2 hash of an integer counter"
   end
 
-  def description
+  def self.description
     desc = <<-DESC_END
     This generates a pseudo-random sequence by Murmur2-hashing an integer counter.
     This hash is not designed to be cryptographically secure, but it does produce 

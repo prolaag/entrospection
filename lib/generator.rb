@@ -29,11 +29,11 @@ class Generator
     generator
   end
 
-  def summary
+  def self.summary
     "No summary has been provided for #{self.class}"
   end
 
-  def description
+  def self.description
     "No description has been provided for #{self.class}"
   end
 
