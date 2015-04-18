@@ -19,6 +19,7 @@ class Generator
   # Alternate constructor that reads the byte limit (if present) from ARGV.
   # Writes output to dst, or returns the generator if dst == nil
   def self.run(dst = $stdout)
+    Signal.trap("INT") { exit(0) }
     limit = Float::INFINITY
     if ARGV[0].to_i != 0
       unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[ARGV[0][-1].downcase]
