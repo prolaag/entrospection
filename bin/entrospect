@@ -5,6 +5,7 @@ PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
 require 'entrospection.rb'
+require 'erb'
 
 def usage
   msg =<<-HERE
@@ -35,8 +36,15 @@ ensure
   end
   ent.pvalues_png.save('pvalues.png', :interlace => true)
 
-  # This is going to need to be cleaned up, but I'm deferring because we'll
-  # probably want to use ERB to modify the file contents to contain metadata.
-  cmd =  "cp #{PROJECT_DIR}/lib/report.html ."
-  system( cmd )
+  #generate ERB report
+  options = File.open(".options", 'r').read.split(";")
+  generator = options[0]
+  description = options[1]
+  length = options[2]
+
+  template = File.open("#{PROJECT_DIR}/lib/report.html.erb", 'r').read
+  erb = ERB.new(template)
+  File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }
+
+
 end
