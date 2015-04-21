@@ -20,9 +20,9 @@ Or install it yourself as:
 
 ### Included sample generators
  
-   Call the entropy generation tool 'entrogen' with the -g switch and redirect the output to a file.
+   Call the entropy generation tool 'entrogen' with a the name of a generator and redirect the output to a file.
 
-    $ entrogen -g GENERATOR_NAME -l nnn > path-to-file
+    $ entrogen GENERATOR_NAME -l nnn > path-to-file
 
        GENERATOR   the name of one of the pseudo random number generators provided in the gem. 
 
@@ -37,6 +37,6 @@ Or install it yourself as:
     
     or use entrogen to generate a stream that is piped into entrogen
     
-    $ entrogen -g md5 -l 10485760 | entrospect
+    $ entrogen md5 -l 10485760 | entrospect
 
 The output of entrospect is a collection of ".png" files and a simple html report that can be opened in a browser. Each ".png" is named for the test that created the chart.
