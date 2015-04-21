@@ -33,7 +33,7 @@ class PrunedBitGenerator < Generator
     @s = (@s * 6364136223846793005 + 1442695040888963407) % 2**64
     raw = Digest::MD5.digest(@s.to_s)
     #prune LSB randomly. about half the expected effect since some are already zero
-    raw = raw.unpack('C*').map { |x| rand < 0.01 ? x & 0xFE : x }.pack('C*')
+    raw = raw.unpack('C*').map { |x| @i % 100 == 0 ? x & 0xFE : x }.pack('C*')
     raw
   end
 

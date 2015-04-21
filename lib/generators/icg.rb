@@ -4,7 +4,6 @@
 # congruential generation method
 
 require_relative '../generator.rb'
-require 'prime'
 
 class IcgGenerator < Generator
   def initialize(*args)
