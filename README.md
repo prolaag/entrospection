@@ -20,7 +20,7 @@ Or install it yourself as:
 
 ### Included sample generators
  
-   Call the entropy generation tool 'entrogen' with a the name of a generator and redirect the output to a file.
+   Call the entropy generation tool 'entrogen' with a the name of a generator and redirect the output to a file. To see a list of generators use the -h switch.
 
     $ entrogen GENERATOR_NAME -l nnn > path-to-file
 
