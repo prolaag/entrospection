@@ -63,4 +63,7 @@ rescue OptionParser::MissingArgument => e
   exit 1
 end
 
+#create a description file to build a more descriptive report
+File.open(".options", 'w+') { |file| file.write(klass.to_s[0, klass.to_s.length - 9] + ';' + klass.description + ';' + (opts[:limit] || 0).to_s) }
+
 klass.new(opts[:limit] || Float::INFINITY).pipe_to($stdout)
