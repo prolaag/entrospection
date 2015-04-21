@@ -28,18 +28,14 @@ generators = load_generators()
 opts = {}
 parser = OptionParser.new do |options|
   options.banner =<<-HERE
-Usage: ./#{File.basename($0)} [options] | entrospect
-       ./#{File.basename($0)} [options] > <path-to-file> 
+Usage: ./#{File.basename($0)} [options] GENERATOR-NAME | entrospect
+       ./#{File.basename($0)} [options] GENERATOR-NAME > <path-to-file> 
 
 Available Generators:
    - #{summaries_for(generators).join("\n   - ")}
 
 Options:
 HERE
-
-  options.on("-g", "--generator GENERATOR", "name of generator") do |g|
-    opts[:generator] = g
-  end
 
   options.on("-l", "--limit n[K|M|G]", "generate exactly n bytes") do |l|
     unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[l[-1].downcase]
@@ -55,12 +51,16 @@ end
 
 begin
   parser.parse!
+  # take whats left from the command line and assume it for the generator name
+  opts[:generator] = ARGV.shift
   klass = generators.find do |k|
     k.to_s.downcase == opts[:generator].downcase + 'generator'
   end
-rescue OptionParser::MissingArgument => e
-  puts parser
-  exit 1
+  exit 1 unless klass
+rescue Exception
+    puts "Error: you must provide a valid generator name"
+    puts parser
+    exit 1
 end
 
 klass.new(opts[:limit] || Float::INFINITY).pipe_to($stdout)
