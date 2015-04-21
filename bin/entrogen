@@ -44,7 +44,7 @@ HERE
 
   options.on("-h", "--help", "Show this help") do
     puts options
-    exit
+    exit 0
   end
 
 end
@@ -52,14 +52,16 @@ end
 begin
   parser.parse!
   # take whats left from the command line and assume it for the generator name
+  raise "Too many arguments" if ARGV.length > 1
+  raise "You must specify a generator name" if ARGV.length < 1
   opts[:generator] = ARGV.shift
   klass = generators.find do |k|
     k.to_s.downcase == opts[:generator].downcase + 'generator'
   end
-  exit 1 unless klass
-rescue Exception
-    puts "Error: you must provide a valid generator name"
-    puts parser
+  raise "Unknown generator: #{opts[:generator]}" unless klass
+rescue
+    $stderr.puts "Error: #{$!}"
+    $stderr.puts parser
     exit 1
 end
 
