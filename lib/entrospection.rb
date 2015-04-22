@@ -48,7 +48,7 @@ class Entrospection
   # .each_byte()
   def <<(src)
     unless @prev_byte
-      if src.class <= IO
+      if src.respond_to?(:read)
         @prev_byte = src.read(1).ord
       elsif src.class <= String
         @prev_byte = src[0].ord

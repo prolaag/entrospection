@@ -9,6 +9,7 @@
 # readchar(), readbyte(), each(), each_char(), and each_byte().
 
 class Generator
+  LIBDIR = File.absolute_path(File.dirname(__FILE__))
 
   def initialize(limit = Float::INFINITY)
     @bytes_remaining = limit
@@ -68,7 +69,7 @@ class Generator
   end
 
   def readbyte
-    read(1).ord
+    readchar.ord
   end
 
   def each
@@ -89,6 +90,36 @@ class Generator
       return $!
     end
     nil
+  end
+
+  # List all subclasses (effectively list all generators)
+  def self.descendants
+    ObjectSpace.each_object(Class).select { |klass| klass < self }
+  end
+
+  def self.load_all
+    @@gmap = {}
+
+    # Load our generator classes
+    gen = Dir.glob(File.join(LIBDIR, 'generators', '*.rb'))
+    gen.each { |g| require g }
+
+    # Build a map of string-name to class
+    descendants.each do |k|
+      name = k.to_s.sub('Generator', '')
+      @@gmap[name.downcase] = k
+    end
+  end
+
+  # Return a text description array of all canned generator summaries
+  def self.summaries
+    @@gmap.map do |name,klass|
+      "#{name}#{' ' * (14 - name.length)}- #{klass.summary}"
+    end
+  end
+
+  def self.gmap
+    @@gmap
   end
 
 end

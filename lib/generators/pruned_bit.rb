@@ -37,8 +37,6 @@ class PrunedBitGenerator < Generator
     raw
   end
 
-
 end
 
 PrunedBitGenerator.run if __FILE__ == $0
-
