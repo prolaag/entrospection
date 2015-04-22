@@ -4,26 +4,11 @@ PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
 require 'optparse'
+require 'generator.rb'
 
 Signal.trap("INT") { exit(0) }
 
-# Require and return a list of all canned generators
-def load_generators
-  klasses = Module.constants
-  gen = Dir.glob(File.join(PROJECT_DIR, 'lib', 'generators', '*.rb'))
-  gen.each { |g| require g }
-  klasses = (Module.constants - klasses).map { |k| Kernel.const_get(k) }
-  klasses.select { |k| k.class == Class and k.superclass == Generator }
-end
-
-def summaries_for(generators)
-  generators.map do |generator|
-    name = generator.to_s.sub('Generator', '')
-    "#{name}#{' ' * (14 - name.length)}- #{generator.summary}"
-  end
-end
-
-generators = load_generators()
+Generator.load_all
 
 opts = {}
 parser = OptionParser.new do |options|
@@ -32,7 +17,7 @@ Usage: ./#{File.basename($0)} [options] GENERATOR-NAME | entrospect
        ./#{File.basename($0)} [options] GENERATOR-NAME > <path-to-file> 
 
 Available Generators:
-   - #{summaries_for(generators).join("\n   - ")}
+   - #{Generator.summaries.join("\n   - ")}
 
 Options:
 HERE
@@ -55,9 +40,7 @@ begin
   raise "Too many arguments" if ARGV.length > 1
   raise "You must specify a generator name" if ARGV.length < 1
   opts[:generator] = ARGV.shift
-  klass = generators.find do |k|
-    k.to_s.downcase == opts[:generator].downcase + 'generator'
-  end
+  klass = Generator.gmap[opts[:generator]]
   raise "Unknown generator: #{opts[:generator]}" unless klass
 rescue
     $stderr.puts "Error: #{$!}"

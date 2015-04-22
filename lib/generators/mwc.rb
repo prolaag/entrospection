@@ -13,7 +13,7 @@ class MwcGenerator < Generator
   end
 
   def self.summary
-    "Marsaglia's 16-bit multiple-with-carry pseudo-random number generator"
+    "Marsaglia's 16-bit multiple-with-carry PRNG"
   end
 
   def self.description
