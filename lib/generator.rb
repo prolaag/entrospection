@@ -69,7 +69,7 @@ class Generator
   end
 
   def readbyte
-    read(1).ord
+    readchar.ord
   end
 
   def each

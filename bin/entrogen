@@ -40,12 +40,12 @@ begin
   raise "Too many arguments" if ARGV.length > 1
   raise "You must specify a generator name" if ARGV.length < 1
   opts[:generator] = ARGV.shift
-  klass = Generator.gmap[opts[:generator]]
+  klass = Generator.gmap[opts[:generator].downcase]
   raise "Unknown generator: #{opts[:generator]}" unless klass
 rescue
-    $stderr.puts "Error: #{$!}"
-    $stderr.puts parser
-    exit 1
+  $stderr.puts "Error: #{$!}"
+  $stderr.puts parser
+  exit 1
 end
 
 #create a description file to build a more descriptive report

@@ -4,27 +4,60 @@
 PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
-require 'entrospection.rb'
+require 'optparse'
 require 'erb'
+require 'entrospection.rb'
+require 'generator.rb'
 
-def usage
-  msg =<<-HERE
-  Usage: #{File.basename($0)} <path-to-file>
+Generator.load_all
 
-      or pipe some stream into #{File.basename($0)}
+opts = {
+  :limit => Float::INFINITY,
+  :src => $stdin,
+  :report => nil,
+}
 
-         <some-stream> | #{File.basename($0)}
-  HERE
-  puts msg
-  exit 0
+parser = OptionParser.new do |op|
+  op.banner = "Usage: #{File.basename($0)} [-g <gen>] [-f <file>] [-l bytes]"
+
+  op.on('-l', '--limit n[K|M|G]', 'only process n bytes') do |l|
+    unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[l[-1].downcase]
+    opts[:limit] = l.to_i * (unit || 1)
+  end
+
+  op.on('-g', '--generator <name>', 'use a builtin generator') do |g|
+    klass = Generator.gmap[g.downcase]
+    raise "Unknown generator - #{g}" unless klass
+    opts[:src] = klass
+  end
+
+  op.on('-f', '--file <name>', 'read entropy from a binary file') do |f|
+    opts[:src] = File.open(f, :encoding => 'BINARY')
+  end
+
+  op.on('-h', '--help', 'show help and list generators') do
+    puts parser
+    puts "\nAvailable Generators:"
+    puts "   - #{Generator.summaries.sort.join("\n   - ")}"
+    Kernel.exit(0)
+  end
 end
 
-usage if ARGV.first == '-h'
-src = $stdin
-src = File.open(ARGV.first) if ARGV.first
+begin
+  parser.parse!
+  raise "Invalid option: #{ARGV.first}" unless ARGV.empty?
+  if opts[:src].class <= Class and opts[:src] <= Generator
+    opts[:src] = opts[:src].new(opts[:limit])
+  end
+rescue
+  $stderr.puts "Error: #{$!}"
+  Kernel.exit(1)
+end
+puts opts[:src].respond_to?(:read)
+
 ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
 begin
-  ent << src
+  ent << opts[:src]
 rescue Exception => e
   $stderr.puts "Stream terminated, saving analysis..."
 ensure
@@ -36,7 +69,7 @@ ensure
   end
   ent.pvalues_png.save('pvalues.png', :interlace => true)
 
-  #generate ERB report
+  # Generate our report
   options = File.open(".options", 'r').read.split(";")
   generator = options[0]
   description = options[1]
@@ -45,6 +78,4 @@ ensure
   template = File.open("#{PROJECT_DIR}/lib/report.html.erb", 'r').read
   erb = ERB.new(template)
   File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }
-
-
 end
