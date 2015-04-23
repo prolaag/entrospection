@@ -25,7 +25,7 @@ class SHA512Generator < Generator
 
   def next_chunk
     @i += 1
-    return Digest::SHA2.new(512).hexdigest([@i].pack("C"))
+    return Digest::SHA2.new(512).hexdigest([@i].pack("Q>"))
   end
 end
 
