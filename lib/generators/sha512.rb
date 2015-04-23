@@ -2,7 +2,7 @@
 
 require_relative '../generator.rb'
 
-require 'digest'
+require 'digest/sha2'
 
 class SHA512Generator < Generator
   def initialize(*args)
@@ -25,7 +25,7 @@ class SHA512Generator < Generator
 
   def next_chunk
     @i += 1
-    return Digest::SHA2.new(512).hexdigest([@i].pack("Q>"))
+    return Digest::SHA2.new(512).digest([@i].pack("Q>"))
   end
 end
 
