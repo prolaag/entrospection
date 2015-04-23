@@ -15,7 +15,7 @@ opts = {
   :limit => Float::INFINITY,
   :src => $stdin,
   :name => 'stdin',
-  :report => nil,
+  :report => 'report.html',
 }
 
 parser = OptionParser.new do |op|
@@ -57,6 +57,23 @@ rescue
   Kernel.exit(1)
 end
 
+# Show a byte count in a "nice" human-readable format
+def nice_bytes(count)
+  suffix = [ '', 'K', 'M', 'G', 'T', 'P' ]
+  while count > 999
+    count /= 1024.0
+    suffix.shift
+  end
+  if count >= 100
+    count = count.to_i.to_s
+  elsif count >= 10
+    count = '%2.1f' % count
+  else
+    count = '%1.2f' % count
+  end
+  count + suffix.shift + 'B'
+end
+
 ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
 begin
   ent << opts[:src]
@@ -73,8 +90,8 @@ ensure
 
   # Generate our report
   generator = opts[:name]
-  bytes = ent.bytes
-  template = File.open("#{PROJECT_DIR}/lib/report.html.erb", 'r').read
-  erb = ERB.new(template)
+  bytes = nice_bytes(ent.bytes)
+  report = File.read("#{PROJECT_DIR}/lib/report.html.erb")
+  erb = ERB.new(report)
   File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }
 end
