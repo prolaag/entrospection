@@ -14,11 +14,12 @@ Generator.load_all
 opts = {
   :limit => Float::INFINITY,
   :src => $stdin,
-  :report => nil,
+  :name => 'stdin',
+  :report => 'report.html',
 }
 
 parser = OptionParser.new do |op|
-  op.banner = "Usage: #{File.basename($0)} [-g <gen>] [-f <file>] [-l bytes]"
+  op.banner = "Usage: #{File.basename($0)} [options]"
 
   op.on('-l', '--limit n[K|M|G]', 'only process n bytes') do |l|
     unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[l[-1].downcase]
@@ -29,10 +30,12 @@ parser = OptionParser.new do |op|
     klass = Generator.gmap[g.downcase]
     raise "Unknown generator - #{g}" unless klass
     opts[:src] = klass
+    opts[:name] = klass.to_s
   end
 
   op.on('-f', '--file <name>', 'read entropy from a binary file') do |f|
     opts[:src] = File.open(f, :encoding => 'BINARY')
+    opts[:name] = "File: #{File.basename(f)}"
   end
 
   op.on('-h', '--help', 'show help and list generators') do
@@ -53,7 +56,23 @@ rescue
   $stderr.puts "Error: #{$!}"
   Kernel.exit(1)
 end
-puts opts[:src].respond_to?(:read)
+
+# Show a byte count in a "nice" human-readable format
+def nice_bytes(count)
+  suffix = [ '', 'K', 'M', 'G', 'T', 'P' ]
+  while count > 999
+    count /= 1024.0
+    suffix.shift
+  end
+  if count >= 100
+    count = count.to_i.to_s
+  elsif count >= 10
+    count = '%2.1f' % count
+  else
+    count = '%1.2f' % count
+  end
+  count + suffix.shift + 'B'
+end
 
 ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
 begin
@@ -70,12 +89,9 @@ ensure
   ent.pvalues_png.save('pvalues.png', :interlace => true)
 
   # Generate our report
-  options = File.open(".options", 'r').read.split(";")
-  generator = options[0]
-  description = options[1]
-  length = options[2]
-
-  template = File.open("#{PROJECT_DIR}/lib/report.html.erb", 'r').read
-  erb = ERB.new(template)
+  generator = opts[:name]
+  bytes = nice_bytes(ent.bytes)
+  report = File.read("#{PROJECT_DIR}/lib/report.html.erb")
+  erb = ERB.new(report)
   File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }
 end
