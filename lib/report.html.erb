@@ -7,7 +7,6 @@ table, th, td {
   font-size:12px;
   letter-spacing:0px;
   font-family:sans-serif;
-
 }
 table {
   border-spacing: 15px;
@@ -18,8 +17,6 @@ img {
 body {
   color: white;
   background-color: black;
-
-  
 }
 </style></head>
 <body>
@@ -28,18 +25,12 @@ body {
   <tr>
     <td>
       <h1><%= generator %></h1>
-      <b>Iterations</b>: <%= length %><br><br>
-      <b>Description</b>:<br> <%= description %>
+      <b>Processed</b>: <%= bytes %><br><br>
     </td>
     <td><b>Covariance</b><br><img src="covariance.png"></td>
     <td><b>Byte Frequency</b><br><img src="byte.png"></td>
-    <td><b>Bit Frequency</b><br><img src="bit.png"></td>	
-  </tr>
-  <tr>
-    <td><b>Binomial</b><br><img src="binomial.png"></td>
-    <td><b>Q-Independence</b><br><img src="qindependence.png"></td>
-    <td><b>Gauss Sum</b><br><img src="gauss_sum.png"></td>
-    <td><b>Runs</b><br><img src="runs.png"></td>
+    <td><b>Bit Frequency</b><br><img src="bit.png"></td>
+    <td><b>P-Values</b><br><img src="pvalues.png"></td>
   </tr>
 </table>
 
