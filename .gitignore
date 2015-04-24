@@ -7,3 +7,5 @@ bit.png
 covariance.png
 pvalues.png
 report.html
+cine/*
+!cine/.readme
