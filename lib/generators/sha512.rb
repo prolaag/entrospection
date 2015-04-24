@@ -11,7 +11,7 @@ class SHA512Generator < Generator
   end
 
   def self.summary
-    "SHA2 hash with a 512-byte bit length"
+    "SHA2 hash with a 512 bit length"
   end
 
   def self.description
