@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# Reads a 128 bytes per chunk request at a time from the /dev/random device
+# Reads 128 bytes per chunk per request from the /dev/random device
 # node (which will block until there is proper entropy).
 
 require_relative '../generator.rb'
