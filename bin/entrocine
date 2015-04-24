@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+# encoding: ASCII-8BIT
+
+PROJECT_DIR = File.expand_path('../..', __FILE__)
+$LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
+
+require 'entrospection.rb'
+
+opts = {
+  :high => 2**23,     # 8MB
+  :backoff => 2**17,  # 128kB
+  :frames => 1800,    # 30fps for 1 minute
+}
+
+ent = Entrospection.new
+chunks = []
+opts[:frames].times do |frame|
+
+  # Fill up, one chunk at a time, until we hit our high water mark
+  while chunks.length * opts[:backoff] < opts[:high]
+    chunks << $stdin.read(opts[:backoff])
+    raise "all done" if chunks.last.length < opts[:backoff]
+    ent << chunks.last
+  end
+
+  # Merge our statistical-inspection images
+  merged = ChunkyPNG::Image.new(512, 512)
+  sub = [ ent.covariance_png, ent.byte_png, ent.bit_png, ent.pvalues_png ]
+  256.times do |x|
+    256.times do |y|
+      merged[x, y] = sub[0][x, y]
+      merged[x + 256, y] = sub[1][x, y]
+      merged[x, y + 256] = sub[2][x, y]
+      merged[x + 256, y + 256] = sub[3][x, y]
+    end
+  end
+  merged.save('cine/entro%08u.png' % frame, :interlace => true)
+
+  # Back out the oldest chunk
+  ent >> chunks.shift
+
+end

@@ -74,7 +74,7 @@ def nice_bytes(count)
   count + suffix.shift + 'B'
 end
 
-ent = Entrospection.new(width: 1, height: 1, contrast: 0.4)
+ent = Entrospection.new()
 begin
   ent << opts[:src]
 rescue Exception => e
