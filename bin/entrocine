@@ -9,7 +9,7 @@ require 'entrospection.rb'
 opts = {
   :high => 2**23,     # 8MB
   :backoff => 2**17,  # 128kB
-  :frames => 1800,    # 30fps for 1 minute
+  :frames => 18,    # 30fps for 1 minute
 }
 
 ent = Entrospection.new
@@ -39,4 +39,11 @@ opts[:frames].times do |frame|
   # Back out the oldest chunk
   ent >> chunks.shift
 
+end
+
+# Finally, if ffmpeg is installed, generate our movie
+begin
+  `ffmpeg -framerate 15 -i cine/entro%8d.png -c:v libx264 -r 30 -pix_fmt yuv420p entro.mp4`
+rescue Errno::ENOENT
+  $stderr.puts "ffmpeg does not appear to be installed; images left in cine/*"
 end
