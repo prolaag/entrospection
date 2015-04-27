@@ -4,22 +4,53 @@
 PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
+require 'optparse'
 require 'entrospection.rb'
 
+Signal.trap("INT") { exit(0) }
+
+# Take a string that may end with a 'k', 'm', or 'g' and treat it as a suffixed
+# number of bytes. Case doesn't matter.
+def parse_bytes(str)
+  unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[str[-1].downcase]
+  str.to_i * (unit || 1)
+end
+
 opts = {
-  :high => 2**23,     # 8MB
-  :backoff => 2**17,  # 128kB
+  :window => 2**23,   # 8MB
+  :slide => 2**17,    # 128kB
   :frames => 1800,    # 30fps for 1 minute
 }
+parser = OptionParser.new do |options|
+  options.banner = "Usage: <data src> | #{File.basename($0)} [options]"
+
+  options.on('-w', '--window n[K|M|G]', 'specify a total window size') do |w|
+    opts[:window] = parse_bytes(w)
+  end
+
+  options.on('-s', '--slide n[K|M|G]', 'specify a window slide amount') do |s|
+    opts[:slide] = parse_bytes(s)
+  end
+
+  options.on('-f', '--frames n', 'specify total number of output frames') do |f|
+    opts[:frames] = f.to_i
+  end
+
+  options.on('-h', '--help', 'show this help') do
+    puts options
+    exit 0
+  end
+end
+parser.parse!
 
 ent = Entrospection.new
 chunks = []
 opts[:frames].times do |frame|
 
   # Fill up, one chunk at a time, until we hit our high water mark
-  while chunks.length * opts[:backoff] < opts[:high]
-    chunks << $stdin.read(opts[:backoff])
-    raise "all done" if chunks.last.length < opts[:backoff]
+  while chunks.length * opts[:slide] < opts[:window]
+    chunks << $stdin.read(opts[:slide])
+    raise "all done" if chunks.last.length < opts[:slide]
     ent << chunks.last
   end
 
@@ -39,4 +70,11 @@ opts[:frames].times do |frame|
   # Back out the oldest chunk
   ent >> chunks.shift
 
+end
+
+# Finally, if ffmpeg is installed, generate our movie
+begin
+  `ffmpeg -framerate 15 -i cine/entro%8d.png -c:v libx264 -r 30 -pix_fmt yuv420p entro.mp4`
+rescue Errno::ENOENT
+  $stderr.puts "ffmpeg does not appear to be installed; images left in cine/*"
 end
