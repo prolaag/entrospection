@@ -12,7 +12,7 @@ class CirclesGenerator < Generator
   end
 
   def self.summary
-    "Generate something remotely resembling a circle"
+    'Generate something remotely resembling a circle'
   end
 
   def self.description
@@ -36,10 +36,8 @@ class CirclesGenerator < Generator
     num = [
       Math.cos(vals[0] * 2 * Math::PI) * amp + 128,
       Math.sin(vals[0] * 2 * Math::PI) * amp + 128,
-#      vals[0] * amp * 2 + 128 - amp,
       Math.cos(vals[1] * 2 * Math::PI) * amp + 128,
       Math.sin(vals[1] * 2 * Math::PI) * amp + 128,
-#      vals[1] * amp * 2 + 128 - amp,
     ]
 
     val = 0
@@ -49,28 +47,7 @@ class CirclesGenerator < Generator
 
     [ val ].pack('L>')
   end
-
-  def next_chunk2
-    amp = (@r.rand(1) + 1) * 128
-    vals = [
-      Math::PI * @r.rand,
-      Math::PI * @r.rand,
-    ]
-    num = [
-      Math.sin(-vals[0]) * amp + amp + 128 - amp,
-      amp - Math.cos(vals[0]) * amp + 128 - amp,
-      Math.sin(vals[1]) * amp + amp + 128 - amp,
-      Math.cos(vals[1]) * amp + amp + 128 - amp,
-    ]
-    val = 0
-    num.each_with_index do |n, idx|
-      val += (n.to_i) << 8 * idx
-    end
-
-    [ val ].pack('L>')
-  end
-
 end
 
-RubyGenerator.run if __FILE__ == $0
+CirclesGenerator.run if __FILE__ == $0
 
