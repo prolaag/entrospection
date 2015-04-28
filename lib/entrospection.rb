@@ -8,23 +8,10 @@ class Entrospection
   PROJ_ROOT = File.expand_path('../..', __FILE__)
   GENERATOR_DIR = File.expand_path('lib/generators', PROJ_ROOT)
 
-  def initialize(opts = {})
+  def initialize()
     @set_bit_lookup = (0..255).collect { |i| i.to_s(2).count('1') }
-    @width = opts.fetch(:width, 1).to_i
-    @height = opts.fetch(:height, 1).to_i
-    @contrast = opts.fetch(:contrast, 0.5).to_f.abs
-
-    # Option validation
-    remaining = (opts.keys - [ :width, :height, :contrast ]).first
-    raise ArgumentError, "unrecognized option: #{remaining}" if remaining
-    raise ArgumentError, "contrast out of bounds" if @contrast > 1.0
-    raise ArgumentError, "height too small" if @height < 1
-    raise ArgumentError, "width too small" if @width < 1
-
-    # Size-adjustable display
-    @faces = @width * @height
-    @grid = Array.new(256) { Array.new(256) { Array.new(@faces, 0) } }
-    @face = 0
+    @contrast = 0.5
+    @grid = Array.new(256) { Array.new(256, 0) }
 
     # Streaming analysis
     @prev_byte = nil
@@ -32,6 +19,7 @@ class Entrospection
     @set_bits = 0
     @q_set_bits = 0
     @qbuf = [ 0 ] * 8
+    @unqbuf = [ 0 ] * 8
     @ddec = 0
     @dinc = 0
     @byte_count = [ 0 ] * 256
@@ -40,19 +28,19 @@ class Entrospection
     @pvalue = Hash.new { |h,k| h[k] = Array.new }
     @pvalue_interval = 128
   end
-  attr_reader :width, :height, :grid, :faces, :bytes, :set_bits, :pvalue
-  attr_reader :byte_histogram
+  attr_reader :grid, :bytes, :set_bits, :pvalue
+  attr_reader :byte_histogram, :byte_count
   attr_accessor :contrast
 
   # Stream bytes in for analysis. Provide any object that responds to
   # .each_byte()
   def <<(src)
     unless @prev_byte
-      if src.class <= IO
+      if src.respond_to?(:read)
         @prev_byte = src.read(1).ord
       elsif src.class <= String
         @prev_byte = src[0].ord
-        bytes = src[1..-1]
+        src = src[1..-1]
       else
         @prev_byte = src.to_i % 256
         return nil
@@ -62,14 +50,13 @@ class Entrospection
       @set_bits += @set_bit_lookup[@prev_byte]
     end
 
-    # Process, rotating through all faces one byte at a time
+    # Process each byte
     src.each_byte do |c|
       @byte_count[c] += 1
       @set_bits += @set_bit_lookup[c]
       @bytes += 1
-      @grid[@prev_byte][c][@face] += 1
+      @grid[@prev_byte][c] += 1
       @prev_byte = c
-      @face = (@face + 1) % @faces
 
       # Runs and Q-independence tests
       @q_set_bits += @set_bit_lookup[@qbuf.shift ^ c]
@@ -106,6 +93,47 @@ class Entrospection
     end
   end
 
+  # Stream bytes *out* of the beginning of the buffer, so we can create a
+  # "rolling window" effect.
+  def >>(src)
+    sub_bytes = 0
+    unless @prev_unbyte
+      if src.respond_to?(:read)
+        @prev_unbyte = src.read(1).ord
+      elsif src.class <= String
+        @prev_unbyte = src[0].ord
+        src = src[1..-1]
+      else
+        @prev_unbyte = src.to_i % 256
+        return nil
+      end
+      sub_bytes = 1
+      @byte_count[@prev_unbyte] -= 1
+      @set_bits -= @set_bit_lookup[@prev_unbyte]
+    end
+
+    # Now process each un-byte
+    src.each_byte do |c|
+      @byte_count[c] -= 1
+      @set_bits -= @set_bit_lookup[c]
+      sub_bytes += 1
+      @grid[@prev_unbyte][c] -= 1
+      @prev_unbyte = c
+      @q_set_bits -= @set_bit_lookup[@unqbuf.shift ^ c]
+      @unqbuf.push c
+    end
+
+    # For the p-value tests, just delete the first periodic test values
+    # corresponding to the fraction of bytes we're subtracting. For example,
+    # if we're subtracting 2,000 out of 8,000 gathered bytes, delete the first
+    # 25% of results from our arrays.
+    @pvalue.each do |_,a|
+      frac = a.length * sub_bytes / @bytes
+      a[0...frac] = []
+    end
+    @bytes -= sub_bytes
+  end
+
   # Helper method to compute the probability that a truly random, unbiased
   # sequence would produce a ratio of set bits to total bits more extreme
   # than those provided.
@@ -117,33 +145,25 @@ class Entrospection
 
   # Minimum and maximum grid values
   def grid_min
-    @grid.collect { |col| col.collect { |row| row.min }.min }.min
+    @grid.collect { |col| col.min }.min
   end
   def grid_max
-    @grid.collect { |col| col.collect { |row| row.max }.max }.max
+    @grid.collect { |col| col.max }.max
   end
 
   # Return a ChunkyPNG image describing all observed adjacent byte correlations
   def covariance_png
-    png = ChunkyPNG::Image.new(@width * 256, @height * 256)
+    png = ChunkyPNG::Image.new(256, 256)
     f = 0
 
     # Color auto-scaling
     adj = grid_min * @contrast
     scale = 255.5 / (grid_max - adj)
 
-    # Render each pixel; faces are interleved
-    @width.times do |w|
-      @height.times do |h|
-        256.times do |row|
-          256.times do |col|
-            color = (scale * (@grid[col][row][f] - adj)).to_i
-            x = col * @width + w
-            y = row * @height + h
-            png[x, y] = ChunkyPNG::Color.rgba(color, color, color, 0xFF)
-          end
-        end
-        f += 1
+    256.times do |y|
+      256.times do |x|
+        color = (scale * (@grid[x][y] - adj)).to_i
+        png[x, y] = ChunkyPNG::Color.rgba(color, color, color, 0xFF)
       end
     end
     png
@@ -152,7 +172,7 @@ class Entrospection
   # Return a 256-element array of normalized byte frequencies. The most frequent
   # byte will be represented by 1.0, and all other bytes as a fraction thereof.
   def byte_histogram
-    freq = @grid.collect { |c| c.collect { |r| r.inject(:+) }.inject(:+) }
+    freq = @grid.collect { |c| c.inject(:+) }
     max = freq.max
     freq.collect { |x| x.to_f / max }
   end

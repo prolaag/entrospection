@@ -4,26 +4,11 @@ PROJECT_DIR = File.expand_path('../..', __FILE__)
 $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
 require 'optparse'
+require 'generator.rb'
 
 Signal.trap("INT") { exit(0) }
 
-# Require and return a list of all canned generators
-def load_generators
-  klasses = Module.constants
-  gen = Dir.glob(File.join(PROJECT_DIR, 'lib', 'generators', '*.rb'))
-  gen.each { |g| require g }
-  klasses = (Module.constants - klasses).map { |k| Kernel.const_get(k) }
-  klasses.select { |k| k.class == Class and k.superclass == Generator }
-end
-
-def summaries_for(generators)
-  generators.map do |generator|
-    name = generator.to_s.sub('Generator', '')
-    "#{name}#{' ' * (14 - name.length)}- #{generator.summary}"
-  end
-end
-
-generators = load_generators()
+Generator.load_all
 
 opts = {}
 parser = OptionParser.new do |options|
@@ -32,7 +17,7 @@ Usage: ./#{File.basename($0)} [options] GENERATOR-NAME | entrospect
        ./#{File.basename($0)} [options] GENERATOR-NAME > <path-to-file> 
 
 Available Generators:
-   - #{summaries_for(generators).join("\n   - ")}
+   - #{Generator.summaries.join("\n   - ")}
 
 Options:
 HERE
@@ -44,7 +29,7 @@ HERE
 
   options.on("-h", "--help", "Show this help") do
     puts options
-    exit
+    exit 0
   end
 
 end
@@ -52,18 +37,15 @@ end
 begin
   parser.parse!
   # take whats left from the command line and assume it for the generator name
+  raise "Too many arguments" if ARGV.length > 1
+  raise "You must specify a generator name" if ARGV.length < 1
   opts[:generator] = ARGV.shift
-  klass = generators.find do |k|
-    k.to_s.downcase == opts[:generator].downcase + 'generator'
-  end
-  exit 1 unless klass
-rescue Exception
-    puts "Error: you must provide a valid generator name"
-    puts parser
-    exit 1
+  klass = Generator.gmap[opts[:generator].downcase]
+  raise "Unknown generator: #{opts[:generator]}" unless klass
+rescue
+  $stderr.puts "Error: #{$!}"
+  $stderr.puts parser
+  exit 1
 end
-
-#create a description file to build a more descriptive report
-File.open(".options", 'w+') { |file| file.write(klass.to_s[0, klass.to_s.length - 9] + ';' + klass.description + ';' + (opts[:limit] || 0).to_s) }
 
 klass.new(opts[:limit] || Float::INFINITY).pipe_to($stdout)
