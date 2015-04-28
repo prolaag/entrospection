@@ -4,6 +4,18 @@ aesecb:             92.6%
 aesecb:             66.4%
 aesecb:             44.4%
 
+  -- burtle --
+burtle:             75.2%
+burtle:             90.0%
+burtle:             32.8%
+burtle:             71.7%
+
+  -- circles --
+circles:            71.5%
+circles:            58.0%
+circles:            42.1%
+circles:            61.7%
+
   -- counter --
 counter:            37.2%
 counter:            90.0%

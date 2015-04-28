@@ -6,5 +6,5 @@ task :clean do
 end
 
 task :test do
-  sh './test/baseline.rb'
+  sh './test/baseline.rb -v'
 end
