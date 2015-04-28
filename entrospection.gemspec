@@ -8,10 +8,11 @@ Gem::Specification.new do |s|
 
   s.summary       = 'Visualize statistical properties of RNGs'
   s.description   = ''
-  s.files         = Dir.glob("{lib,data,bin,test}/**/*") + %w(README.md)
+  s.files         = Dir.glob("{lib,bin}/**/*") + %w(README.md)
 
   s.executables   << 'entrospect'
   s.executables   << 'entrogen'
+  s.executables   << 'entrocine'
 
   s.add_development_dependency 'bundler'
 

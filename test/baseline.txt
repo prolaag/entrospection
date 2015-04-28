@@ -1,0 +1,66 @@
+  -- aesecb --
+aesecb:             46.0%
+aesecb:             92.6%
+aesecb:             66.4%
+aesecb:             44.4%
+
+  -- counter --
+counter:            37.2%
+counter:            90.0%
+counter:            02.4%
+counter:            41.2%
+
+  -- icg --
+icg:                65.8%
+icg:                91.4%
+icg:                51.6%
+icg:                57.4%
+
+  -- lcg --
+lcg:                36.0%
+lcg:                91.6%
+lcg:                00.2%
+lcg:                71.3%
+
+  -- md5 --
+md5:                54.3%
+md5:                91.4%
+md5:                39.1%
+md5:                20.6%
+
+  -- murmur2 --
+murmur2:            31.2%
+murmur2:            93.0%
+murmur2:            58.9%
+murmur2:            52.2%
+
+  -- mwc --
+mwc:                48.3%
+mwc:                88.6%
+mwc:                54.8%
+mwc:                58.7%
+
+  -- prunedbit --
+prunedbit:          57.7%
+prunedbit:          84.9%
+prunedbit:          17.5%
+prunedbit:          81.8%
+
+  -- prunedbyte --
+prunedbyte:         75.4%
+prunedbyte:         84.5%
+prunedbyte:         29.2%
+prunedbyte:         24.8%
+
+  -- ruby --
+ruby:               41.7%
+ruby:               89.6%
+ruby:               64.2%
+ruby:               59.3%
+
+  -- upward --
+upward:             50.5%
+upward:             91.3%
+upward:             56.1%
+upward:             21.4%
+
