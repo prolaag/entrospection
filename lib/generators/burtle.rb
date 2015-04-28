@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# This generates a pseudo-random sequence by using the deterministic pseudo-
-# random number generator built into Ruby
-
 require_relative '../generator.rb'
 
 class BurtleGenerator < Generator
