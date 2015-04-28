@@ -9,7 +9,7 @@ class BurtleGenerator < Generator
   def initialize(*args)
     super(*args)
 
-    seed = 5 # chosen by fair dice roll
+    seed = 0xbeeff00d
     @a = 0xf1ea5eed
     @b = @c = @d = seed
     20.times do
