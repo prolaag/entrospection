@@ -70,6 +70,12 @@ ruby:               89.6%
 ruby:               64.2%
 ruby:               59.3%
 
+  -- sha512 --
+sha512:             29.9%
+sha512:             90.5%
+sha512:             65.0%
+sha512:             27.2%
+
   -- upward --
 upward:             50.5%
 upward:             91.3%
