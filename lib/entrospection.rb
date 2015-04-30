@@ -28,8 +28,7 @@ class Entrospection
     @pvalue = Hash.new { |h,k| h[k] = Array.new }
     @pvalue_interval = 128
   end
-  attr_reader :grid, :bytes, :set_bits, :pvalue
-  attr_reader :byte_histogram, :byte_count
+  attr_reader :grid, :bytes, :set_bits, :pvalue, :byte_count
   attr_accessor :contrast
 
   # Stream bytes in for analysis. Provide any object that responds to
