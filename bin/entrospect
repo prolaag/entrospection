@@ -92,8 +92,6 @@ ensure
   ent.pvalues_png.save('pvalues.png', :interlace => true)
 
   # Generate our report
-  generator = opts[:name]
-  bytes = nice_bytes(ent.bytes)
   report = File.read("#{PROJECT_DIR}/lib/report.html.erb")
   erb = ERB.new(report)
   File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }

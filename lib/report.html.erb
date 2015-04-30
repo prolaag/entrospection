@@ -25,8 +25,10 @@ body {
   <div id="reports">
   <tr>
     <td>
-      <h1><%= generator %></h1>
-      <b>Processed</b>: <%= bytes %><br><br>
+      <h1><%= opts[:name] %></h1>
+      <b>Processed</b>: <%= nice_bytes(ent.bytes) %><br>
+      <b>Most Freq Byte</b>: <%= '%2.2f%%' % (ent.byte_count.max * 25600.0 / ent.bytes) %><br>
+      <b>Least Freq Byte</b>: <%= '%2.2f%%' % (ent.byte_count.min * 25600.0 / ent.bytes) %><br>
     </td>
     <td><b>Covariance</b><br><img src="covariance.png"></td>
     <td><b>Byte Frequency</b><br><img src="byte.png"></td>
