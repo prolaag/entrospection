@@ -28,6 +28,12 @@ icg:                91.4%
 icg:                51.6%
 icg:                57.4%
 
+  -- increment --
+increment:          87.3%
+increment:          99.9%
+increment:          00.0%
+increment:          00.0%
+
   -- lcg --
 lcg:                36.0%
 lcg:                91.6%

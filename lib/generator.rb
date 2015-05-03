@@ -96,7 +96,9 @@ class Generator
 
   # List all subclasses (effectively list all generators)
   def self.descendants
-    ObjectSpace.each_object(Class).select { |klass| klass < self }
+    kids = ObjectSpace.each_object(Class).select do |klass|
+      klass < self and klass != IOGenerator
+    end
   end
 
   def self.load_all
