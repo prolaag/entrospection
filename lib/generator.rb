@@ -22,9 +22,11 @@ class Generator
   def self.run(dst = $stdout)
     Signal.trap("INT") { exit(0) }
     limit = Float::INFINITY
-    if ARGV[0].to_i != 0
-      unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[ARGV[0][-1].downcase]
-      limit = ARGV[0].to_i * (unit || 1)
+    if ARGV.last.to_i != 0
+      unit = { 'k' => 1024, 'm' => 2**20, 'g' => 2**30 }[ARGV.last[-1].downcase]
+      limit = ARGV.last.to_i * (unit || 1)
+    else
+      raise "Invalid command line arguments" unless ARGV.empty?
     end
     generator = self.new(limit)
     generator.pipe_to(dst) if dst
@@ -94,7 +96,9 @@ class Generator
 
   # List all subclasses (effectively list all generators)
   def self.descendants
-    ObjectSpace.each_object(Class).select { |klass| klass < self }
+    kids = ObjectSpace.each_object(Class).select do |klass|
+      klass < self and klass != IOGenerator
+    end
   end
 
   def self.load_all
@@ -120,6 +124,21 @@ class Generator
 
   def self.gmap
     @@gmap
+  end
+
+end
+
+# This class takes an IO object and mimics a Generator, which in turn mimics
+# an IO object (only with an enforced read limit).
+class IOGenerator < Generator
+
+  def initialize(io, limit = Float::INFINITY)
+    super(limit)
+    @src_o = io
+  end
+
+  def next_chunk
+    @src_o.readpartial(64)
   end
 
 end

@@ -28,6 +28,12 @@ icg:                91.4%
 icg:                51.6%
 icg:                57.4%
 
+  -- increment --
+increment:          87.3%
+increment:          99.9%
+increment:          00.0%
+increment:          00.0%
+
   -- lcg --
 lcg:                36.0%
 lcg:                91.6%
@@ -69,6 +75,12 @@ ruby:               41.7%
 ruby:               89.6%
 ruby:               64.2%
 ruby:               59.3%
+
+  -- sha512 --
+sha512:             29.9%
+sha512:             90.5%
+sha512:             65.0%
+sha512:             27.2%
 
   -- upward --
 upward:             50.5%
