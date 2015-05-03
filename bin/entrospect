@@ -51,9 +51,8 @@ begin
   raise "Invalid option: #{ARGV.first}" unless ARGV.empty?
   if opts[:src].class <= Class and opts[:src] <= Generator
     opts[:src] = opts[:src].new(opts[:limit])
-  end
-  if opts[:src].class <= File and opts[:limit] < opts[:src].size
-    opts[:src].pos = opts[:src].size - opts[:limit]
+  else
+    opts[:src] = IOGenerator.new(opts[:src], opts[:limit])
   end
 rescue
   $stderr.puts "Error: #{$!}"

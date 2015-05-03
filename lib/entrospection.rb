@@ -83,7 +83,7 @@ class Entrospection
           # double our sampling interval.
           if @pvalue[:binomial].length == 1024
             @pvalue.keys.each do |ptype|
-              512.times { |i| @pvalue[ptype].delete_at i }
+              512.times { |i| @pvalue[ptype][i, 2] = @pvalue[ptype][i, 2].min }
             end
             @pvalue_interval *= 2
           end
