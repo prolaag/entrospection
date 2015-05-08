@@ -212,11 +212,12 @@ class Entrospection
     png
   end
 
-  # Return a ChunkyPNG image describing the distribution of each bit
+  # Return a ChunkyPNG image describing the distribution of each bit, with the
+  # most significant bit on the left.
   def bit_png
     png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
     256.times { |x| png[x, 128] = ChunkyPNG::Color.rgba(99, 99, 99, 0xFF) }
-    bit_histogram.each_with_index do |freq, i|
+    bit_histogram.reverse.each_with_index do |freq, i|
       # This scales from 48.0% to 52.0%
       h = 2**(Math.log((freq - 0.5).abs, 10) + 8.7) + 1
       h = [ h.to_i, 127 ].min
@@ -242,7 +243,8 @@ class Entrospection
     png
   end
 
-  # Return a ChunkyPNG image graphing the four included pvalue results over time
+  # Return a ChunkyPNG image graphing the four included pvalue results over
+  # time. Runs is the top graph, Binomial is the bottom graph.
   def pvalues_png
     png = ChunkyPNG::Image.new(256, 256, ChunkyPNG::Color::WHITE)
     [ :binomial, :qindependence, :gauss_sum, :runs ].each_with_index do |t, i|
