@@ -1,41 +1,31 @@
-<html>
-<head><style>
-table, th, td {
-  border: 1px solid #111;
-  padding: 5px;
-  vertical-align:text-top;
-  font-size:12px;
-  letter-spacing:0px;
-  font-family:sans-serif;
-}
-table {
-  border-spacing: 15px;
-}
-img {
-  border: 3px double orange;
-}
-body {
-  color: white;
-  background-color: black;
-}
-</style></head>
-<body>
-
-<table style="width:100%">
-  <div id="reports">
   <tr>
     <td>
-      <h1><%= opts[:name] %></h1>
-      <b>Processed</b>: <%= nice_bytes(ent.bytes) %><br>
-      <b>Most Freq Byte</b>: <%= '%2.2f%%' % (ent.byte_count.max * 25600.0 / ent.bytes) %><br>
-      <b>Least Freq Byte</b>: <%= '%2.2f%%' % (ent.byte_count.min * 25600.0 / ent.bytes) %><br>
-    </td>
-    <td><b>Covariance</b><br><img src="covariance.png"></td>
-    <td><b>Byte Frequency</b><br><img src="byte.png"></td>
-    <td><b>Bit Frequency</b><br><img src="bit.png"></td>
-    <td><b>P-Values</b><br><img src="pvalues.png"></td>
-  </tr>
-  </div>
-</table>
+      <h2><%= opts[:name] %></h2>
+      <% score = 100.0
+         bytes = ent.byte_count.collect { |x| x * 25600.0 / ent.bytes }
+         bits = ent.bit_histogram.collect { |x| x * 100 }
+         pvals = ent.pvalue.values.inject(:+).sort
 
-</body></html>
+         # Calculate our total score
+         score *= [ 1, (pvals[pvals.length / 10] * 120)**(1.0 / 3) ].min
+         score *= (1.0 - ((50 - bits.min).abs / 100))
+         score *= (1.0 - ((50 - bits.max).abs / 100))
+         score *= (1.0 - ((100 - bytes.max).abs / 100))
+         score *= (1.0 - ((100 - bytes.min).abs / 100))
+      %>
+      <b>Processed</b>: <%= nice_bytes(ent.bytes) %><br>
+      <b>At</b>: <%= Time.now.strftime("%Y-%m-%d %H:%M") %><br>
+      <b>Most Freq Byte</b>: <%= '%2.2f%%' % bytes.max %><br>
+      <b>Least Freq Byte</b>: <%= '%2.2f%%' % bytes.min %><br>
+      <b>Most Freq Bit</b>: <%= '%2.2f%%' % bits.max %><br>
+      <b>Least Freq Bit</b>: <%= '%2.2f%%' % bits.min %><br>
+      <b>Minimum p-value</b>: <%= '%0.5f' % pvals[0] %><br>
+      <b>10th% p-value</b>: <%= '%0.5f' % pvals[pvals.length / 10] %><br>
+      <b>Median p-value</b>: <%= '%0.5f' % pvals[pvals.length / 2] %><br>
+      <br><b>Score</b>: <%= '%2.2f%%' % score %>
+    </td>
+    <td><b>Covariance</b><br><img src="<%= prefix %>covariance.png"></td>
+    <td><b>Byte Frequency</b><br><img src="<%= prefix %>byte.png"></td>
+    <td><b>Bit Frequency</b><br><img src="<%= prefix %>bit.png"></td>
+    <td><b>P-Values</b><br><img src="<%= prefix %>pvalues.png"></td>
+  </tr>

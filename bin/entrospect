@@ -6,6 +6,7 @@ $LOAD_PATH.push(File.join(PROJECT_DIR, 'lib'))
 
 require 'optparse'
 require 'erb'
+require 'fileutils'
 require 'entrospection.rb'
 require 'generator.rb'
 
@@ -76,22 +77,38 @@ def nice_bytes(count)
   count + suffix.shift + 'B'
 end
 
+# Increment our filename prefix (for images)
+FileUtils.mkdir_p("img")
+slot = Dir.glob("img/*.png").map { |x| File.basename(x).to_i }.max.to_i + 1
+prefix = "img/#{slot}_"
+
+# Go ahead and grab all the reports out of our current HTML doc
+unless File.exist?('report.html')
+  FileUtils.cp("#{PROJECT_DIR}/lib/report_container.html", 'report.html')
+end
+header, footer = File.read('report.html').split("\n</table>\n")
+
 ent = Entrospection.new()
 begin
   ent << opts[:src]
 rescue Exception => e
   $stderr.puts "Stream terminated, saving analysis..."
 ensure
-  ent.covariance_png.save('covariance.png', :interlace => true)
-  ent.byte_png.save('byte.png', :interlace => true)
-  ent.bit_png.save('bit.png', :interlace => true)
-  ent.pvalue.each_key do |pt|
-    ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
-  end
-  ent.pvalues_png.save('pvalues.png', :interlace => true)
+  ent.covariance_png.save("#{prefix}covariance.png", :interlace => true)
+  ent.byte_png.save("#{prefix}byte.png", :interlace => true)
+  ent.bit_png.save("#{prefix}bit.png", :interlace => true)
+  # ent.pvalue.each_key do |pt|
+  #   ent.pvalue_png(pt).save("#{pt}.png", :interlace => true)
+  # end
+  ent.pvalues_png.save("#{prefix}pvalues.png", :interlace => true)
 
   # Generate our report
   report = File.read("#{PROJECT_DIR}/lib/report.html.erb")
   erb = ERB.new(report)
-  File.open("report.html", 'w+') { |file| file.write(erb.result(binding)) }
+  File.open("report.html", 'w') do |file|
+   file.puts header
+   file.print erb.result(binding)
+   file.print "\n</table>\n"
+   file.print footer
+  end
 end

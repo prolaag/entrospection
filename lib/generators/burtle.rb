@@ -15,7 +15,7 @@ class BurtleGenerator < Generator
   end
 
   def self.summary
-    "A Ruby implementation of Bob Jenkins' 'Small Non-Cryptographic PRNG'"
+    "Bob Jenkins' \"Small Non-Cryptographic PRNG\""
   end
 
   def self.description
