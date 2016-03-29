@@ -34,7 +34,7 @@ class PiEinTheSin < Generator
 
   def next_chunk
     @i += 1
-    Math::sin(divE(pimulti(@i))).to_s
+    [Math::sin(divE(pimulti(@i)))].pack('d')
   end
 
 end
