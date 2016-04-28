@@ -26,16 +26,15 @@ class XorshiftStar < Generator
     desc.gsub(/\s+/, " ").strip
   end
 
-  def xorshift_star(sseed)
-    x = sseed.unpack('Q>')[0]
+  def xorshift_star(x)
     x ^= x >> 12
     x ^= x << 25
     x ^= x >> 27
-    return x * 2685821657736338717
+    return (x * 2685821657736338717) % 2**64
   end
     
   def next_chunk
-    @i = xorshift_star([@i].pack('Q>'))
+    @i = xorshift_star(@i)
     [@i].pack('Q>')
   end
 
