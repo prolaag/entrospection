@@ -94,3 +94,9 @@ upward:             91.3%
 upward:             56.1%
 upward:             21.4%
 
+  -- xorshiftstar --
+xorshiftstar:       64.7%
+xorshiftstar:       89.6%
+xorshiftstar:       53.4%
+xorshiftstar:       46.5%
+
