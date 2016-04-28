@@ -58,6 +58,12 @@ mwc:                88.6%
 mwc:                54.8%
 mwc:                58.7%
 
+  -- pieinthesin --
+pieinthesin:        00.0%
+pieinthesin:        83.5%
+pieinthesin:        00.0%
+pieinthesin:        72.5%
+
   -- prunedbit --
 prunedbit:          57.7%
 prunedbit:          84.9%
