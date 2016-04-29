@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-# This generates a pseudo-random sequence by using OpenSSL's keyed-hash message authentication code (HMAC) along with a randomly generated key
+# This generates a pseudo-random sequence by using OpenSSL's keyed-hash message authentication code (HMAC)
 
 require_relative '../generator.rb'
 require 'openssl'
@@ -19,12 +19,12 @@ class HmacGenerator < Generator
   end
 
   def self.summary
-    "OpenSSL HMAC hash of an integer counter and random key"
+    "OpenSSL HMAC hash of an integer counter"
   end
 
   def self.description
     desc = <<-DESC_END
-      This generates a pseudo-random sequence by using HMAC to hash an integer counter with a randomly generated key.
+      This generates a pseudo-random sequence by using HMAC to hash an integer counter.
     DESC_END
     desc.gsub(/\s+/, " ").strip
   end
