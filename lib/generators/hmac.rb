@@ -14,7 +14,7 @@ class HmacGenerator < Generator
 
   def initialize(*args)
     super(*args)
-    @key = (0...32).map { (48 + rand(43)).chr }.join
+    @key = (0...32).map{ |i| i.to_s 32}.join
     @i = 1
   end
 
