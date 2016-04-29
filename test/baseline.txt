@@ -76,6 +76,12 @@ prunedbyte:         84.5%
 prunedbyte:         29.2%
 prunedbyte:         24.8%
 
+  -- rc4 --
+rc4:                18.9%
+rc4:                88.3%
+rc4:                61.7%
+rc4:                37.6%
+
   -- ruby --
 ruby:               41.7%
 ruby:               89.6%
