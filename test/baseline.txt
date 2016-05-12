@@ -22,6 +22,12 @@ counter:            90.0%
 counter:            02.4%
 counter:            41.2%
 
+  -- hmac --
+hmac:               53.9%
+hmac:               88.7%
+hmac:               71.5%
+hmac:               40.6%
+
   -- icg --
 icg:                65.8%
 icg:                91.4%
