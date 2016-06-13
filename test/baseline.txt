@@ -100,6 +100,12 @@ sha512:             90.5%
 sha512:             65.0%
 sha512:             27.2%
 
+  -- taylor --
+taylor:             00.0%
+taylor:             50.0%
+taylor:             00.0%
+taylor:             19.5%
+
   -- upward --
 upward:             50.5%
 upward:             91.3%
