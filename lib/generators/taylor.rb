@@ -27,10 +27,8 @@ class TaylorGenerator < Generator
     @b = (@b + @i) % 256
     @i = @i + @b + @t + 3
     @t = (@t * (@b + 1)) % 1102031013030304
-  
-   return @b.chr
-
- end
+    @b.chr
+  end
 
 end
 
